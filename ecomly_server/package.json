@@ -9,6 +9,10 @@
   },
   "author": "kisahtegar",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kisahtegar/ecomly/issues"
+  },
+  "homepage": "https://github.com/kisahtegar/ecomly#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
@@ -21,8 +25,10 @@
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
     "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
-    "stripe": "^18.2.1"
+    "stripe": "^18.4.0"
   }
 }
