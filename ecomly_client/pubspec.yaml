@@ -1,0 +1,70 @@
+name: ecomly_client
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  country_picker: ^2.0.27
+  dartz: ^0.10.1
+  equatable: ^2.0.7
+  flutter:
+    sdk: flutter
+  flutter_multi_formatter: ^2.13.9
+  flutter_riverpod: ^2.6.1
+  gap: ^3.0.1
+  get_it: ^8.2.0
+  go_router: ^16.2.0
+  http: ^1.5.0
+  lottie: ^3.3.1
+  pin_code_fields: ^8.0.1
+  riverpod_annotation: ^2.6.1
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  riverpod_lint: ^2.6.5
+  riverpod_generator: ^2.6.5
+  build_runner: ^2.5.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/lottie/
+
+  fonts:
+    - family: Switzer
+      fonts:
+        - asset: assets/fonts/Switzer-Black.otf
+        - asset: assets/fonts/Switzer-BlackItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Bold.otf
+        - asset: assets/fonts/Switzer-BoldItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Extrabold.otf
+        - asset: assets/fonts/Switzer-ExtraboldItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Extralight.otf
+        - asset: assets/fonts/Switzer-ExtralightItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Italic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Light.otf
+        - asset: assets/fonts/Switzer-LightItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Medium.otf
+        - asset: assets/fonts/Switzer-MediumItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Regular.otf
+        - asset: assets/fonts/Switzer-Semibold.otf
+        - asset: assets/fonts/Switzer-SemiboldItalic.otf
+          style: italic
+        - asset: assets/fonts/Switzer-Thin.otf
+        - asset: assets/fonts/Switzer-ThinItalic.otf
+          style: italic
