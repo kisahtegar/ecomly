@@ -1,6 +1,16 @@
 const { User } = require("../models/user");
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
+/**
+ * Get All Users
+ *
+ * Fetches a list of all users from the database with selected fields.
+ *
+ * @param {Object} _ - Unused Express request object.
+ * @param {Object} res - Express response object, returns user list or error response.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if not found, 500 on server error)
+ */
 exports.getUsers = async (_, res) => {
   try {
     const users = await User.find().select("name email id isAdmin");
@@ -14,6 +24,16 @@ exports.getUsers = async (_, res) => {
   }
 };
 
+/**
+ * Get User by ID
+ *
+ * Retrieves a single user by ID, excluding sensitive fields.
+ *
+ * @param {Object} req - Express request object, expects `id` in params.
+ * @param {Object} res - Express response object, returns user data or error response.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if not found, 500 on server error)
+ */
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select(
@@ -29,6 +49,16 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+/**
+ * Update User
+ *
+ * Updates a user's basic information (name, email, phone).
+ *
+ * @param {Object} req - Express request object, expects `id` in params and `name`, `email`, `phone` in body.
+ * @param {Object} res - Express response object, returns updated user or error response.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if not found, 500 on server error)
+ */
 exports.updateUser = async (req, res) => {
   try {
     const { name, email, phone } = req.body;
@@ -49,6 +79,16 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+/**
+ * Get Payment Profile
+ *
+ * Retrieves Stripe billing portal session link for a user with a payment profile.
+ *
+ * @param {Object} req - Express request object, expects `id` in params.
+ * @param {Object} res - Express response object, returns billing portal URL or error response.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if not found, 500 on server error)
+ */
 exports.getPaymentProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

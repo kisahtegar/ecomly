@@ -1,10 +1,21 @@
 const { validationResult } = require("express-validator");
-const { User } = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { User } = require("../models/user");
 const { Token } = require("../models/token");
 const mailSender = require("../helpers/email_sender");
 
+/**
+ * Register a new user
+ *
+ * Handles new user registration by validating input, hashing the password,
+ * and creating a new user document in MongoDB.
+ *
+ * @param {Object} req - Express request object, expects `email`, `password`, and user details in body.
+ * @param {Object} res - Express response object, returns newly created user or error response.
+ *
+ * @returns {JSON} Various status codes (200, 400, 404, 500)
+ */
 exports.register = async function (req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -41,6 +52,17 @@ exports.register = async function (req, res) {
   }
 };
 
+/**
+ * Login user
+ *
+ * Authenticates a user by verifying email and password, then generates
+ * and stores access/refresh tokens.
+ *
+ * @param {Object} req - Express request object, expects `email` and `password` in body.
+ * @param {Object} res - Express response object, returns user data with access token or error.
+ *
+ * @returns {JSON} Various status codes (200, 400, 404, 500)
+ */
 exports.login = async function (req, res) {
   try {
     const { email, password } = req.body;
@@ -81,6 +103,19 @@ exports.login = async function (req, res) {
   }
 };
 
+/**
+ * Verify JWT token
+ *
+ * Middleware that checks for a valid JWT in the `Authorization` header.
+ * If valid, attaches the decoded user info to `req.user` and continues.
+ * If invalid or missing, responds with an error.
+ *
+ * @param {Object} req - Express request object, expects `Authorization` header with Bearer token.
+ * @param {Object} res - Express response object, returns error if token is invalid or missing.
+ * @param {Function} next - Express next middleware function to pass control.
+ *
+ * @returns {JSON} Various status codes (200 if valid, 401/403 if invalid, 500 on error)
+ */
 exports.verifyToken = async function (req, res) {
   try {
     let accessToken = req.headers.authorization;
@@ -107,6 +142,16 @@ exports.verifyToken = async function (req, res) {
   }
 };
 
+/**
+ * Forgot Password
+ *
+ * Generates and sends a password reset OTP to the user's email.
+ *
+ * @param {Object} req - Express request object, expects `email` in body.
+ * @param {Object} res - Express response object, returns success message or error.
+ *
+ * @returns {JSON} Various status codes (200 on success, 400/404 for errors, 500 on server error)
+ */
 exports.forgotPassword = async function (req, res) {
   try {
     const { email } = req.body;
@@ -138,6 +183,16 @@ exports.forgotPassword = async function (req, res) {
   }
 };
 
+/**
+ * Verify Password Reset OTP
+ *
+ * Validates the OTP entered by the user against the one stored in the database.
+ *
+ * @param {Object} req - Express request object, expects `email` and `otp` in body.
+ * @param {Object} res - Express response object, returns verification result.
+ *>
+ * @returns {JSON} Various status codes (200 if OTP valid, 400/404 for errors, 500 on server error)
+ */
 exports.verifyPasswordResetOTP = async function (req, res) {
   try {
     const { email, otp } = req.body;
@@ -164,6 +219,16 @@ exports.verifyPasswordResetOTP = async function (req, res) {
   }
 };
 
+/**
+ * Reset Password
+ *
+ * Allows user to reset password after successful OTP verification.
+ *
+ * @param {Object} req - Express request object, expects `email` and new `password` in body.
+ * @param {Object} res - Express response object, returns confirmation message or error.
+ *
+ * @returns {JSON} Various status codes (200 on success, 400/404 for errors, 500 on server error)
+ */
 exports.resetPassword = async function (req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

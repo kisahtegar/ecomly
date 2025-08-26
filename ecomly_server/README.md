@@ -18,45 +18,47 @@
 
 ---
 
-## Overview
+## 🚀 Overview
 
-This backend application is designed to handle the business logic and data processing for our project. It serves as the API layer for the frontend and interacts with a database to provide and store data.
-
-This project utilizes:
-
-- **Express.js**: as the backend framework.
-- **MongoDB**: for the database.
-- **Nodemailer**: For sending emails.
-- **firebase-admin**: For sending notifications and utilizing Firebase services.
+**Ecomly Backend** is the API service powering the **Ecomly e-commerce platform**. It handles authentication, orders, products, addresses, cart management, and transactional emails. This backend is built with **Express.js** and connected to **MongoDB**, following a clean and modular architecture.
 
 ---
 
-## Features
+## 🛠️ Tech Stack
 
-- **User Authentication**: Secure authentication using JWT (JSON Web Token) with role-based access.
-  - **Admin**: Full access to manage users, addresses, and orders.
-  - **User**: Can manage their profile, addresses, and orders.
-- **Address Management**: Allows users to manage their addresses efficiently.
-  - **Add, Edit, Delete**: Users can perform CRUD operations on addresses.
-  - **Set Default Address**: Mark an address as default for easier access.
-  - **Reverse Geocoding**: Automatically retrieves address details from latitude and longitude.
-- **Order Management**: End-to-end order processing system.
-  - **Place Orders**: Users can create new orders with their selected items.
-  - **Track Orders**: Includes features to view and update order statuses.
-  - **Payment Integration**: Supports secure payment handling.
-- **Real-Time Notifications**: Firebase integration to send notifications to users for updates.
-- **Email Support**: Automatic email notifications for order confirmations using Nodemailer.
-- **API Integration**:
-  - **Google Places API**: Enables address autocomplete and geolocation for a seamless user experience.
-- **Security**:
-  - **Encrypted Data**: Sensitive data encrypted with CryptoJS.
-  - **CORS Support**: Enables secure communication between the backend and frontend.
-- **Database Management**: Utilizes MongoDB and Mongoose for data persistence with schema validation.
-- **Robust Error Handling**: Provides clear and consistent API responses for error scenarios.
+- **Express.js** → Web framework
+- **MongoDB + Mongoose** → Database & schema management
+- **JWT** → Authentication & authorization
+- **Nodemailer** → Sending transactional emails (order confirmation, password reset, etc.)
+- **CryptoJS** → Data encryption
+- **CORS** → Secure API communication
 
 ---
 
-## Installation
+## ✨ Features
+
+- **User Authentication**
+  - Register, login, and secure sessions with JWT
+  - Role-based access (Admin & User)
+  - Forgot/Reset password flow with OTP
+- **Address Management**
+  - Add, update, delete addresses
+  - Mark default address
+  - Reverse geocoding with Google Places API
+- **Cart & Order Management**
+  - Cart system with add/remove/update items
+  - Place orders & track order status
+  - Order items linked to products
+  - Payment flow integration ready
+- **Admin Features**
+  - Manage users, orders, and products
+  - View user counts & delete users with cascading data cleanup
+- **Notifications**
+  - Email updates via Nodemailer
+
+---
+
+## ⚡ Installation
 
 ### Prerequisites
 
@@ -72,8 +74,8 @@ Ensure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/kisahtegar/foodly_app.git
-   cd foodly_backend
+   git clone https://github.com/kisahtegar/ecomly.git
+   cd ecomly_server
    ```
 
 2. Install dependencies:
@@ -87,52 +89,34 @@ Ensure you have the following installed:
 3. Set up environment variables: Create a `.env` file in the root directory and add the following variables:
 
    ```env
-   IP="192.168.0.1"
-   PORT=6002
-   MONGO_URL=your_mongodb_url
-   FIREBASE_URL=your_firebasedb_url
-   JWT_SEC=your_jwt_secret
-   SECRET=your_code_secret
-   # ACCOUNT FOR SENDING EMAIL
-   AUTH_USER = antonio@gmail.com
-   AUTH_PASSWORD = loremipsum # PASSWORD GENERATED FROM GOOGLE
+   # API Configuration
+   API_URL=/api/v1
+   HOST=0.0.0.0
+   PORT=3000
+
+   # Database
+   MONGODB_CONNECTION_STRING=mongodb+srv://username:<db_password>@cluster0.frunctl.mongodb.net/ecomly?retryWrites=true&w=majority&appName=Cluster0
+
+   # Authentication
+   ACCESS_TOKEN_SECRET=HI4aeaMd8SnkSzDkSeQG8FuapTLyDebS8KWQACZKvpW8yg99SDwK4vITFtkr
+   REFRESH_TOKEN_SECRET=mhY2seTyUJ7rKQpFdIBRSjC3ILQfdsQpy4WQkbsGGH97hr6Izm6yLLQ6cESz
+
+   # Email (Nodemailer)
+   SMTP_HOST=smtp.gmail.com
+   SMTP_SERVICE=gmail
+   SMTP_PORT=587
+   EMAIL_ADDRESS=your-mail@gmail.com
+   EMAIL_PASSWORD=abcd efgh ijkl mnop
+   # To generate EMAIL_PASSWORD, create an App Password: https://myaccount.google.com/apppasswords
+
+   # Stripe Payments
+   STRIPE_KEY=sk_test_your_api_key
+   STRIPE_WEBHOOK_SECRET=your_webhook_endpoint_secret
    ```
-
-### Firebase Setup
-
-This project uses Firebase Admin SDK for features like real-time notifications and secure user management. Follow these steps to configure Firebase:
-
-1. **Generate the `serviceAccountKey.json` File**:
-   - Go to your [Firebase Console](https://console.firebase.google.com/).
-   - Select your project.
-   - Navigate to **Project Settings > Service Accounts**.
-   - Click **Generate New Private Key** and download the `serviceAccountKey.json` file.
-
-2. **Add the File to the Backend Project**:
-   - Place the downloaded `serviceAccountKey.json` file in the root directory of your project (or any secure location).
-   - Make sure this file is **excluded from version control** by adding the following entry to your `.gitignore` file:
-
-     ```gitignore
-     serviceAccountKey.json
-     ```
-
-3. **Set the Path in Your Code**:
-   - In your backend code, ensure the Firebase Admin SDK is initialized using the `serviceAccountKey.json` file:
-
-     ```javascript
-     const admin = require("firebase-admin");
-     const serviceAccount = require("./serviceAccountKey.json");
-
-     admin.initializeApp({
-       credential: admin.credential.cert(serviceAccount),
-     });
-     ```
-
-By following these steps, your Firebase services will be configured securely.
 
 ---
 
-## Usage
+## ▶️ Usage
 
 ### Running the Server
 
@@ -164,7 +148,7 @@ The server will start at `http://0.0.0.0:3000` by default.
 
 ---
 
-## Postman Collection
+## 📬 API Documentation
 
 To view the complete API documentation and test the endpoints, you can import the [Postman collection](./postman/ecomly.postman_collection.json) into your Postman application. Follow these steps:
 
@@ -176,7 +160,7 @@ This makes it easier for contributors and users to understand and test the API f
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 

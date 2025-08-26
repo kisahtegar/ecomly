@@ -1,3 +1,32 @@
+/**
+ * order_complete_email_builder.js
+ *
+ * Provides functions to generate HTML email templates for completed orders.
+ * The generated template includes user information, order details, and
+ * shipping details, formatted for email clients.
+ */
+
+/**
+ * Builds a full order confirmation email template for the given user and order.
+ *
+ * @function buildEmail
+ * @param {string} userName - The name of the user who placed the order.
+ * @param {Object} order - The order object containing order details.
+ * @param {Array} order.orderItems - List of ordered items.
+ * @param {string} order.orderItems[].productImage - URL of the product image.
+ * @param {string} order.orderItems[].productName - Name of the product.
+ * @param {number|string} order.orderItems[].productPrice - Price of the product.
+ * @param {number} order.orderItems[].quantity - Quantity of the product ordered.
+ * @param {string} [order.orderItems[].selectedColour] - Selected colour (if any).
+ * @param {string} [order.orderItems[].selectedSize] - Selected size (if any).
+ * @param {string} shippingDetailsUsername - Name of the person receiving the order.
+ * @returns {string} A string of HTML representing the formatted email.
+ *
+ * @example
+ * const { buildEmail } = require("./order_complete_email_builder");
+ * const emailHtml = buildEmail("Alice", order, "Alice Wonderland");
+ * console.log(emailHtml);
+ */
 exports.buildEmail = (userName, order, shippingDetailsUsername) => {
   const orderTemplates = [];
   for (const orderItem of order.orderItems) {
@@ -12,7 +41,7 @@ exports.buildEmail = (userName, order, shippingDetailsUsername) => {
       )
     );
   }
-  const orderRows = orderTemplates.join(' ');
+  const orderRows = orderTemplates.join(" ");
   return `
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en" style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
@@ -534,6 +563,29 @@ exports.buildEmail = (userName, order, shippingDetailsUsername) => {
       `;
 };
 
+/**
+ * Generates the HTML for a single order item row in the email template.
+ *
+ * @function orderItemTemplate
+ * @param {string} itemImage - URL of the product image.
+ * @param {string} itemName - Name of the product.
+ * @param {number|string} itemPrice - Price of the product.
+ * @param {number} itemQuantity - Quantity ordered.
+ * @param {string} [selectedColour] - Selected product colour (optional).
+ * @param {string} [selectedSize] - Selected product size (optional).
+ * @returns {string} A string of HTML representing the order item row.
+ *
+ * @example
+ * const rowHtml = orderItemTemplate(
+ *   "https://example.com/image.png",
+ *   "Product Name",
+ *   "$19.99",
+ *   2,
+ *   "Red",
+ *   "L"
+ * );
+ * console.log(rowHtml);
+ */
 function orderItemTemplate(
   itemImage,
   itemName,
@@ -542,8 +594,8 @@ function orderItemTemplate(
   selectedColour,
   selectedSize
 ) {
-  let colorTemplate = '';
-  let sizeTemplate = '';
+  let colorTemplate = "";
+  let sizeTemplate = "";
   if (selectedColour) {
     colorTemplate = `<p class="p_description" style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:tahoma, verdana, segoe, sans-serif;line-height:24px;color:#4D4D4D;font-size:16px">COLOUR: ${selectedColour}</p>`;
   }

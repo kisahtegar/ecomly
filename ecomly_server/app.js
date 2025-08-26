@@ -16,19 +16,34 @@ const API = env.API_URL;
 const hostname = env.HOST;
 const port = env.PORT;
 
+/**
+ * Middleware: Body parser for JSON requests.
+ * Special handling for Stripe webhook which requires raw body.
+ */
 app.use(
   bodyParser.json({
     verify(req, _, buf, __) {
       if (req.path.includes("checkout/webhook")) {
+        // Keep raw body for Stripe validation
         req.rawBody = buf.toString();
       }
     },
   })
 );
+
+// Logging middleware for HTTP requests
 app.use(morgan("tiny"));
+
+// Enable CORS for cross-origin requests
 app.use(cors());
+
+// JWT authentication middleware
 app.use(authJwt());
+
+// Custom middleware to authorize specific POST requests
 app.use(authorizePostRequests);
+
+// Centralized error handler middleware
 app.use(errorHandler);
 
 const authRouter = require("./routes/auth");
@@ -46,18 +61,21 @@ app.use(`${API}/categories`, categoriesRouter);
 app.use(`${API}/products`, productsRouter);
 app.use(`${API}/checkout`, checkoutRouter);
 app.use(`${API}/orders`, ordersRouter);
+
+// Static file serving for public assets
 app.use("/public", express.static(__dirname + "/public"));
 
-// Start the server
+// Database Connection Using Mongoose to connect with MongoDB
 mongoose
   .connect(env.MONGODB_CONNECTION_STRING)
   .then(() => {
-    console.log("Connected to Database");
+    console.log("✅ Connected to Database");
   })
   .catch((error) => {
-    console.error(error);
+    console.error("❌ Database connection error:", error);
   });
 
+// Start the Express server
 app.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}`);
+  console.log(`🚀 Server running at http://${hostname}:${port}`);
 });

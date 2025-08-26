@@ -5,9 +5,14 @@ const path = require("path");
 const ALLOWED_EXTENSIONS = {
   "image/png": "png",
   "image/jpeg": "jpeg",
-  "image/jgp": "jpg",
+  "image/jpg": "jpg",
 };
 
+/**
+ * Multer storage configuration:
+ * - Saves files in `public/uploads`.
+ * - Renames files by removing spaces & extension, then appending timestamp.
+ */
 const storage = multer.diskStorage({
   destination: function (_, __, cb) {
     cb(null, "public/uploads");
@@ -15,18 +20,27 @@ const storage = multer.diskStorage({
   filename: function (_, file, cb) {
     const filename = file.originalname
       .replace(" ", "-")
-      .replace(".png", "")
-      .replace(".jpg", "")
-      .replace(".jpeg", "");
+      .replace(/\.png|\.jpg|\.jpeg/gi, ""); // regex for safety
     const extension = ALLOWED_EXTENSIONS[file.mimetype];
     cb(null, `${filename}-${Date.now()}.${extension}`);
   },
 });
 
+/**
+ * Multer middleware for handling image uploads.
+ *
+ * - Limits file size to 5MB.
+ * - Restricts uploads to allowed MIME types only.
+ *
+ * @example
+ * // Express route
+ * router.post("/upload", upload.single("image"), (req, res) => {
+ *   res.json({ file: req.file });
+ * });
+ */
 exports.upload = multer({
   storage: storage,
-  // 5mb
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB
   fileFilter: (_, file, cb) => {
     const isValid = ALLOWED_EXTENSIONS[file.mimetype];
     let uploadError = new Error(
@@ -37,6 +51,21 @@ exports.upload = multer({
   },
 });
 
+/**
+ * Delete images from the `public/uploads` folder.
+ *
+ * @async
+ * @function deleteImages
+ * @param {string[]} imageUrls - Array of image URLs/paths to delete.
+ * @param {string} continueOnErrorName - File system error code to ignore (e.g., "ENOENT").
+ * @returns {Promise<void>} Resolves when deletion is complete.
+ *
+ * @example
+ * await deleteImages(
+ *   ["/uploads/img1.png", "/uploads/img2.png"],
+ *   "ENOENT" // Ignore "file not found" errors
+ * );
+ */
 exports.deleteImages = async function (imageUrls, continueOnErrorName) {
   await Promise.all(
     imageUrls.map(async (imageUrl) => {

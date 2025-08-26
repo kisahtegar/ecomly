@@ -1,13 +1,24 @@
-const { default: mongoose } = require('mongoose');
-const { Product } = require('../models/product');
-const { CartProduct } = require('../models/cart_product');
-const { OrderItem } = require('../models/order_item');
-const { Order } = require('../models/order');
-const { User } = require('../models/user');
+const { default: mongoose } = require("mongoose");
+const { Product } = require("../models/product");
+const { CartProduct } = require("../models/cart_product");
+const { OrderItem } = require("../models/order_item");
+const { Order } = require("../models/order");
+const { User } = require("../models/user");
 
+/**
+ * Add Order
+ *
+ * Creates a new order from provided order data. Validates user and product IDs,
+ * creates order items, updates product stock, removes items from user cart,
+ * and saves the order with transactional safety.
+ *
+ * @param {Object} orderData - Contains user ID, orderItems array, and other order details.
+ *
+ * @returns {Object} Returns the created order object, or logs error on failure
+ */
 exports.addOrder = async function (orderData) {
   if (!mongoose.isValidObjectId(orderData.user)) {
-    return console.error('User Validation Failed: Invalid user!');
+    return console.error("User Validation Failed: Invalid user!");
   }
 
   const session = await mongoose.startSession();
@@ -17,7 +28,7 @@ exports.addOrder = async function (orderData) {
     const user = await User.findById(orderData.user);
     if (!user) {
       await session.abortTransaction();
-      return console.trace('ORDER CREATION FAILED: User not found');
+      return console.trace("ORDER CREATION FAILED: User not found");
     }
 
     const orderItems = orderData.orderItems;
@@ -29,7 +40,7 @@ exports.addOrder = async function (orderData) {
       ) {
         await session.abortTransaction();
         return console.trace(
-          'ORDER CREATION FAILED: Invalid product in the order'
+          "ORDER CREATION FAILED: Invalid product in the order"
         );
       }
 
@@ -38,7 +49,7 @@ exports.addOrder = async function (orderData) {
       if (!cartProduct) {
         await session.abortTransaction();
         return console.trace(
-          'ORDER CREATION FAILED: Invalid cart product in the order'
+          "ORDER CREATION FAILED: Invalid cart product in the order"
         );
       }
 
@@ -46,7 +57,7 @@ exports.addOrder = async function (orderData) {
       if (!orderItemModel) {
         await session.abortTransaction();
         console.trace(
-          'ORDER CREATION FAILED:',
+          "ORDER CREATION FAILED:",
           `An order for product "${product.name}" could not be `
         );
       }
@@ -65,18 +76,18 @@ exports.addOrder = async function (orderData) {
       await user.save({ session });
     }
 
-    orderData['orderItems'] = orderItemIds;
+    orderData["orderItems"] = orderItemIds;
 
     let order = new Order(orderData);
-    order.status = 'processed';
-    order.statusHistory.push('processed');
+    order.status = "processed";
+    order.statusHistory.push("processed");
 
     order = await order.save({ session });
 
     if (!order) {
       await session.abortTransaction();
       return console.trace(
-        'ORDER CREATION FAILED: The order could not be created.'
+        "ORDER CREATION FAILED: The order could not be created."
       );
     }
 
@@ -90,24 +101,34 @@ exports.addOrder = async function (orderData) {
   }
 };
 
+/**
+ * Get User Orders
+ *
+ * Retrieves all orders for a specific user, grouped into active, completed, and cancelled orders.
+ *
+ * @param {Object} req - Express request object, expects userId in params.
+ * @param {Object} res - Express response object, returns grouped orders.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if no orders found, 500 on error)
+ */
 exports.getUserOrders = async function (req, res) {
   try {
     const orders = await Order.find({ user: req.params.userId })
-      .select('orderItems status totalPrice dateOrdered')
-      .populate({ path: 'orderItems', select: 'productName productImage' })
+      .select("orderItems status totalPrice dateOrdered")
+      .populate({ path: "orderItems", select: "productName productImage" })
       .sort({ dateOrdered: -1 });
 
     if (!orders) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     const completed = [];
     const active = [];
     const cancelled = [];
     for (const order of orders) {
-      if (order.status === 'delivered') {
+      if (order.status === "delivered") {
         completed.push(order);
-      } else if (['cancelled', 'expired'].includes(order.status)) {
+      } else if (["cancelled", "expired"].includes(order.status)) {
         cancelled.push(order);
       } else {
         active.push(order);
@@ -120,11 +141,21 @@ exports.getUserOrders = async function (req, res) {
   }
 };
 
+/**
+ * Get Order By ID
+ *
+ * Retrieves a single order by its ID along with its populated order items.
+ *
+ * @param {Object} req - Express request object, expects order `id` in params.
+ * @param {Object} res - Express response object, returns the order.
+ *
+ * @returns {JSON} Various status codes (200 on success, 404 if not found, 500 on error)
+ */
 exports.getOrderById = async function (req, res) {
   try {
-    const order = await Order.findById(req.params.id).populate('orderItems');
+    const order = await Order.findById(req.params.id).populate("orderItems");
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
     return res.json(order);
   } catch (error) {

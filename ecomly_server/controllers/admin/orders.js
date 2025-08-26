@@ -1,6 +1,17 @@
 const { Order } = require("../../models/order");
 const { OrderItem } = require("../../models/order_item");
 
+/**
+ * Get Orders
+ *
+ * Retrieves all orders with populated user information and order items,
+ * including product name and category name. Excludes the `statusHistory` field.
+ *
+ * @param {Object} _ - Express request object (unused).
+ * @param {Object} res - Express response object, returns JSON array of orders or error.
+ *
+ * @returns {JSON} Status codes 200 on success, 404 if no orders, 500 on error
+ */
 exports.getOrders = async function (_, res) {
   try {
     const orders = await Order.find()
@@ -26,6 +37,16 @@ exports.getOrders = async function (_, res) {
   }
 };
 
+/**
+ * Get Orders Count
+ *
+ * Returns the total number of orders in the database.
+ *
+ * @param {Object} _ - Express request object (unused).
+ * @param {Object} res - Express response object, returns JSON with orders count or error.
+ *
+ * @returns {JSON} Status codes 200 on success, 500 on error
+ */
 exports.getOrdersCount = async function (_, res) {
   try {
     const count = await Order.countDocuments();
@@ -39,6 +60,17 @@ exports.getOrdersCount = async function (_, res) {
   }
 };
 
+/**
+ * Change Order Status
+ *
+ * Updates the status of a specific order and appends previous status
+ * to the `statusHistory` array if not already present.
+ *
+ * @param {Object} req - Express request object, expects order `id` in params and `status` in body.
+ * @param {Object} res - Express response object, returns updated order or error.
+ *
+ * @returns {JSON} Status codes 200 on success, 400 if order not found, 500 on error
+ */
 exports.changeOrderStatus = async function (req, res) {
   try {
     const orderId = req.params.id;
@@ -61,6 +93,16 @@ exports.changeOrderStatus = async function (req, res) {
   }
 };
 
+/**
+ * Delete Order
+ *
+ * Deletes an order and all associated order items from the database.
+ *
+ * @param {Object} req - Express request object, expects order `id` in params.
+ * @param {Object} res - Express response object, returns 204 on success, 404 if order not found, 500 on error.
+ *
+ * @returns {JSON} Status codes 204 on success, 404/500 on error
+ */
 exports.deleteOrder = async function (req, res) {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
