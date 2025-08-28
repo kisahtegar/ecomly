@@ -32,11 +32,29 @@ final router = GoRouter(
       },
     ),
     GoRoute(path: LoginScreen.path, builder: (_, __) => const LoginScreen()),
+    GoRoute(
+      path: ForgotPasswordScreen.path,
+      builder: (_, __) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: VerifyOTPScreen.path,
+      builder: (_, state) => VerifyOTPScreen(email: state.extra as String),
+    ),
+    GoRoute(
+      path: ResetPasswordScreen.path,
+      builder: (_, state) => ResetPasswordScreen(email: state.extra as String),
+    ),
+    GoRoute(
+      path: RegistrationScreen.path,
+      builder: (_, __) => const RegistrationScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) {
         return DashboardScreen(state: state, child: child);
       },
-      routes: const [],
+      routes: [
+        GoRoute(path: HomeView.path, builder: (_, __) => const HomeView()),
+      ],
     ),
   ],
 );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:ecomly_client/core/resources/styles/colours.dart';
 import 'package:ecomly_client/core/services/injection_container.dart';
@@ -7,7 +8,7 @@ import 'package:ecomly_client/core/services/router.dart' show router;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init();
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {

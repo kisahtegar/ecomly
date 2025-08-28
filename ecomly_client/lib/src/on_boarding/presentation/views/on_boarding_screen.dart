@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:ecomly_client/src/on_boarding/presentation/widgets/on_boarding_info_section.dart';
+
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
 
@@ -19,7 +21,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           child: PageView(
             allowImplicitScrolling: true,
             controller: pageController,
-            children: const [],
+            children: const [
+              OnBoardingInfoSection.first(),
+              OnBoardingInfoSection.second(),
+            ],
           ),
         ),
       ),

@@ -4,6 +4,8 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   await _cacheInit();
+  await _authInit();
+  await _userInit();
 }
 
 Future<void> _cacheInit() async {
@@ -11,4 +13,34 @@ Future<void> _cacheInit() async {
   sl
     ..registerLazySingleton(() => CacheHelper(sl()))
     ..registerLazySingleton(() => prefs);
+}
+
+Future<void> _authInit() async {
+  sl
+    ..registerLazySingleton(() => ForgotPassword(sl()))
+    ..registerLazySingleton(() => Login(sl()))
+    ..registerLazySingleton(() => Register(sl()))
+    ..registerLazySingleton(() => ResetPassword(sl()))
+    ..registerLazySingleton(() => VerifyOTP(sl()))
+    ..registerLazySingleton(() => VerifyToken(sl()))
+    ..registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImplementation(sl()),
+    )
+    ..registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImplementation(sl()),
+    )
+    ..registerLazySingleton(http.Client.new);
+}
+
+Future<void> _userInit() async {
+  sl
+    ..registerLazySingleton(() => GetUser(sl()))
+    ..registerLazySingleton(() => GetUserPaymentProfile(sl()))
+    ..registerLazySingleton(() => UpdateUser(sl()))
+    ..registerLazySingleton<UserRepository>(
+      () => UserRepositoryImplementation(sl()),
+    )
+    ..registerLazySingleton<UserRemoteDataSource>(
+      () => UserRemoteDataSourceImpl(sl()),
+    );
 }
