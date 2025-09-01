@@ -2,6 +2,9 @@ import 'package:ecomly_client/core/usecase/usecase.dart';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/user/domain/repositories/user_repository.dart';
 
+/// Retrieves the payment profile ID of a user.
+///
+/// Delegates to [UserRepository.getUserPaymentProfile].
 class GetUserPaymentProfile extends FutureUsecaseWithParams<String, String> {
   const GetUserPaymentProfile(this._repo);
 

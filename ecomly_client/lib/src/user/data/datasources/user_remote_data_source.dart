@@ -27,11 +27,28 @@ abstract class UserRemoteDataSource {
 
 const USERS_ENDPOINT = '/users';
 
+/// User Remote Data Source Implementation
+///
+/// Handles all user-related network requests such as fetching user details,
+/// updating user information, and retrieving the user’s payment profile.
+/// Communicates directly with the backend API and throws [ServerException]
+/// on failure.
 class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   const UserRemoteDataSourceImpl(this._client);
 
   final http.Client _client;
 
+  /// Fetches a single [UserModel] from the remote API using the provided [userId].
+  ///
+  /// This method sends a `GET` request to the `/users/{userId}` endpoint, including
+  /// authentication headers from the cached session token. After receiving the response:
+  /// - It attempts to renew the session token if necessary.
+  /// - If the status code is `200`, the response payload is deserialized into a [UserModel].
+  /// - If the status code is not `200`, a [ServerException] is thrown with details from
+  ///   the error response.
+  ///
+  /// Throws:
+  /// - [ServerException] if the request fails due to server error or unexpected issues.
   @override
   Future<UserModel> getUser(String userId) async {
     try {
@@ -67,11 +84,24 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     }
   }
 
+  /// Retrieves the payment profile URL for a given user.
+  ///
+  /// This method sends a `GET` request to `/users/{userId}/paymentProfile`,
+  /// using authentication headers from the cached session token. After
+  /// processing the response:
+  /// - If the status code is `200`, the method extracts and returns the `url`
+  ///   field from the response payload.
+  /// - If the status code is not `200`, it throws a [ServerException] with
+  ///   details from the error response.
+  ///
+  /// Throws:
+  /// - [ServerException] if the request fails due to server error or other
+  ///   unexpected issues.
   @override
   Future<String> getUserPaymentProfile(String userId) async {
     try {
       final uri = Uri.parse(
-        '${NetworkConstants.baseUrl}$USERS_ENDPOINT/$userId/paymentProile',
+        '${NetworkConstants.baseUrl}$USERS_ENDPOINT/$userId/paymentProfile',
       );
 
       final response = await _client.get(
@@ -102,6 +132,22 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
     }
   }
 
+  /// Updates a user's information on the server.
+  ///
+  /// This method sends a `PUT` request to `/users/{userId}` with the provided
+  /// [updateData] in the request body. After processing the response:
+  /// - If the status code is `200` or `201`, the method parses and returns
+  ///   the updated [UserModel].
+  /// - If the status code indicates an error, it throws a [ServerException]
+  ///   with details from the error response.
+  ///
+  /// Parameters:
+  /// - [userId]: The unique identifier of the user to update.
+  /// - [updateData]: A key-value map containing the fields to update.
+  ///
+  /// Throws:
+  /// - [ServerException] if the request fails due to server error or other
+  ///   unexpected issues.
   @override
   Future<UserModel> updateUser({
     required String userId,

@@ -7,7 +7,14 @@ import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/wishlist/data/models/wishlist_product_model.dart';
 import 'package:ecomly_client/src/wishlist/domain/entities/wishlist_product.dart';
 
+/// Data model for [User], extending the domain entity with:
+/// - JSON/Map serialization and deserialization.
+/// - A [copyWith] method for immutability support.
+/// - Transformation of nested models like [AddressModel] and [WishlistProductModel].
+///
+/// Unlike [User] (pure entity), this model is tied to the **data layer**.
 class UserModel extends User {
+  /// Creates a [UserModel] with all required fields.
   const UserModel({
     required super.id,
     required super.name,
@@ -18,6 +25,8 @@ class UserModel extends User {
     super.phone,
   });
 
+  /// Placeholder instance with `"Test String"` values. Useful for testing,
+  /// mocking, or representing empty user state.
   const UserModel.empty()
     : this(
         id: "Test String",
@@ -29,6 +38,10 @@ class UserModel extends User {
         phone: null,
       );
 
+  /// Returns a new [User] entity with updated fields.
+  ///
+  /// Note: This returns a base [User] (entity) instead of [UserModel],
+  /// which keeps separation between **domain** and **data** layers.
   User copyWith({
     String? id,
     String? name,
@@ -49,6 +62,10 @@ class UserModel extends User {
     );
   }
 
+  /// Converts this model into a key-value [Map].
+  /// Includes nested conversions for:
+  /// - [WishlistProduct] → [WishlistProductModel].
+  /// - [Address] → [AddressModel] (only if not null).
   DataMap toMap() {
     return {
       'id': id,
@@ -63,9 +80,15 @@ class UserModel extends User {
     };
   }
 
+  /// Creates a [UserModel] from a JSON string.
   factory UserModel.fromJson(String source) =>
       UserModel.fromMap(jsonDecode(source) as DataMap);
 
+  /// Creates a [UserModel] from a key-value [map].
+  ///
+  /// - Handles both `id` and `_id` keys for flexibility with backend responses.
+  /// - Builds nested [AddressModel] safely, treating an empty address as `null`.
+  /// - Converts wishlist maps into [WishlistProductModel] instances.
   factory UserModel.fromMap(DataMap map) {
     final address = AddressModel.fromMap({
       if (map case {'street': String street}) 'street': street,
@@ -74,6 +97,7 @@ class UserModel extends User {
       if (map case {'postalCode': String postalCode}) 'postalCode': postalCode,
       if (map case {'country': String country}) 'country': country,
     });
+
     return UserModel(
       id: map['id'] as String? ?? map['_id'] as String,
       name: map['name'] as String,
@@ -87,5 +111,6 @@ class UserModel extends User {
     );
   }
 
+  /// Converts this model into a JSON string.
   String toJson() => jsonEncode(toMap());
 }

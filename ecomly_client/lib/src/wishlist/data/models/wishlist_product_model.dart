@@ -3,7 +3,12 @@ import 'dart:convert';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/wishlist/domain/entities/wishlist_product.dart';
 
+/// Data model for [WishlistProduct].
+///
+/// This ensures smooth communication between the app and external data sources
+/// such as APIs or local storage.
 class WishlistProductModel extends WishlistProduct {
+  /// Creates a [WishlistProductModel] with the given fields.
   const WishlistProductModel({
     required super.productId,
     required super.productName,
@@ -13,6 +18,7 @@ class WishlistProductModel extends WishlistProduct {
     required super.productPrice,
   });
 
+  /// Provides a placeholder instance, useful for testing or as default UI data.
   const WishlistProductModel.empty()
     : this(
         productId: "Test String",
@@ -23,9 +29,11 @@ class WishlistProductModel extends WishlistProduct {
         productOutOfStock: true,
       );
 
+  /// Creates a [WishlistProductModel] from a JSON string.
   factory WishlistProductModel.fromJson(String source) =>
       WishlistProductModel.fromMap(jsonDecode(source) as DataMap);
 
+  /// Creates a [WishlistProductModel] from a map (decoded JSON).
   WishlistProductModel.fromMap(DataMap map)
     : this(
         productId: map['productId'] as String,
@@ -36,6 +44,8 @@ class WishlistProductModel extends WishlistProduct {
         productOutOfStock: map['productOutOfStock'] as bool? ?? false,
       );
 
+  /// Returns a new [WishlistProductModel] with updated values. Any property not
+  /// provided will retain its current value.
   WishlistProductModel copyWith({
     String? productId,
     String? productName,
@@ -54,6 +64,7 @@ class WishlistProductModel extends WishlistProduct {
     );
   }
 
+  /// Converts the model into a [Map] for JSON encoding or local storage.
   DataMap toMap() {
     return <String, dynamic>{
       'productId': productId,
@@ -65,5 +76,6 @@ class WishlistProductModel extends WishlistProduct {
     };
   }
 
+  /// Converts the model into a JSON string.
   String toJson() => jsonEncode(toMap());
 }

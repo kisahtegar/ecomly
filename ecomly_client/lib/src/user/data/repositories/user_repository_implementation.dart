@@ -7,11 +7,23 @@ import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/user/data/datasources/user_remote_data_source.dart';
 import 'package:ecomly_client/src/user/domain/repositories/user_repository.dart';
 
+/// Implementation of [UserRepository] using a remote data source.
+///
+/// This class communicates with [UserRemoteDataSource] to perform user-related
+/// operations such as fetching user details, updating user information, and
+/// retrieving payment profiles. Errors from the remote source are caught and
+/// converted into [ServerFailure] to maintain a consistent failure handling
+/// mechanism.
 class UserRepositoryImplementation implements UserRepository {
   const UserRepositoryImplementation(this._remoteDataSrc);
 
   final UserRemoteDataSource _remoteDataSrc;
 
+  /// Fetches a [User] by [userId].
+  ///
+  /// Returns:
+  /// - [Right(User)] if successful.
+  /// - [Left(ServerFailure)] if a [ServerException] occurs.
   @override
   ResultFuture<User> getUser(String userId) async {
     try {
@@ -22,6 +34,11 @@ class UserRepositoryImplementation implements UserRepository {
     }
   }
 
+  /// Fetches the payment profile ID associated with a user.
+  ///
+  /// Returns:
+  /// - [Right(String)] containing the payment profile ID if successful.
+  /// - [Left(ServerFailure)] if a [ServerException] occurs.
   @override
   ResultFuture<String> getUserPaymentProfile(String userId) async {
     try {
@@ -32,6 +49,11 @@ class UserRepositoryImplementation implements UserRepository {
     }
   }
 
+  /// Updates a [User] with the given [updateData].
+  ///
+  /// Returns:
+  /// - [Right(User)] with updated data if successful.
+  /// - [Left(ServerFailure)] if a [ServerException] occurs.
   @override
   ResultFuture<User> updateUser({
     required String userId,

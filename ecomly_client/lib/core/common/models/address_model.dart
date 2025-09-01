@@ -3,7 +3,14 @@ import 'dart:convert';
 import 'package:ecomly_client/core/common/entities/address.dart';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 
+/// Data model for [Address], extending the entity with serialization/deserialization
+/// capabilities.
+///
+/// Unlike [Address], this model is tailored for data layer usage:
+/// - Converting between JSON/Map and domain entities.
+/// - Providing a [copyWith] method for immutability-friendly updates.
 class AddressModel extends Address {
+  /// Creates an [AddressModel] with optional address details.
   const AddressModel({
     super.street,
     super.apartment,
@@ -12,6 +19,8 @@ class AddressModel extends Address {
     super.country,
   });
 
+  /// Placeholder model with `"Test String"` values.
+  /// Useful for tests, mocks, or representing an uninitialized state.
   const AddressModel.empty()
     : this(
         street: "Test String",
@@ -21,9 +30,11 @@ class AddressModel extends Address {
         country: "Test String",
       );
 
+  /// Creates an [AddressModel] from a JSON string.
   factory AddressModel.fromJson(String source) =>
       AddressModel.fromMap(jsonDecode(source) as DataMap);
 
+  /// Creates an [AddressModel] from a key-value [map].
   AddressModel.fromMap(DataMap map)
     : this(
         street: map['street'] as String?,
@@ -33,6 +44,7 @@ class AddressModel extends Address {
         country: map['country'] as String?,
       );
 
+  /// Returns a copy of this [AddressModel] with overridden fields.
   AddressModel copyWith({
     String? street,
     String? apartment,
@@ -49,6 +61,7 @@ class AddressModel extends Address {
     );
   }
 
+  /// Converts this model into a [Map].
   DataMap toMap() {
     return <String, dynamic>{
       'street': street,
@@ -59,5 +72,6 @@ class AddressModel extends Address {
     };
   }
 
+  /// Converts this model into a JSON string.
   String toJson() => jsonEncode(toMap());
 }

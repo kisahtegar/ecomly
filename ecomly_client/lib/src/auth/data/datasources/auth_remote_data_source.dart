@@ -47,11 +47,31 @@ const VERIFY_OTP_ENDPOINT = '/verify-otp';
 const RESET_PASSWORD_ENDPOINT = '/reset-password';
 const VERIFY_TOKEN_ENDPOINT = '/verify-token';
 
+/// Authentication Remote Data Source Implementation
+///
+/// Provides concrete implementations for handling authentication-related network
+/// requests such as login, registration, token verification, password recovery,
+/// and OTP verification.
+///
+/// This class communicates directly with the backend API, processes responses,
+/// and throws appropriate exceptions (e.g., [ServerException]) when requests fail.
+/// It serves as the bridge between the `AuthRepository` and the remote server.
 class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
   const AuthRemoteDataSourceImplementation(this._client);
 
   final http.Client _client;
 
+  /// Sends a password reset request for the given [email].
+  ///
+  /// This method sends a `POST` request to `/auth/forgotPassword` with the
+  /// user's email in the request body. After processing the response:
+  /// - If the status code is `200`, the request is considered successful.
+  /// - If the status code is not `200`, it parses the error response and throws
+  ///   a [ServerException] with details from the backend.
+  ///
+  /// Throws:
+  /// - [ServerException] if the request fails due to server error or other
+  ///   unexpected issues.
   @override
   Future<void> forgotPassword(String email) async {
     try {
@@ -85,6 +105,18 @@ class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
     }
   }
 
+  /// Authenticates a user with the provided [email] and [password].
+  ///
+  /// This method sends a `POST` request to `/auth/login` with the user's
+  /// credentials in the request body. After receiving the response:
+  /// - If the status code is `200`, it caches the session token and user ID,
+  ///   then parses and returns the [UserModel].
+  /// - If the status code is not `200`, it parses the error response and throws
+  ///   a [ServerException] with the backend-provided message.
+  ///
+  /// Throws:
+  /// - [ServerException] if the login fails due to server error, invalid
+  ///   credentials, or other unexpected issues.
   @override
   Future<UserModel> login({
     required String email,
@@ -122,6 +154,24 @@ class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
     }
   }
 
+  /// Registers a new user with the provided [name], [email], [password], and [phone].
+  ///
+  /// This method sends a `POST` request to `/auth/register` with the user's
+  /// information in the request body. After receiving the response:
+  /// - If the status code is `200` or `201`, the registration is considered
+  ///   successful.
+  /// - If the status code indicates an error, it parses the error response and
+  ///   throws a [ServerException] with the backend-provided message.
+  ///
+  /// Parameters:
+  /// - [name]: The full name of the user.
+  /// - [email]: The user's email address.
+  /// - [password]: The user's chosen password.
+  /// - [phone]: The user's phone number.
+  ///
+  /// Throws:
+  /// - [ServerException] if registration fails due to server error, validation
+  ///   issues, or other unexpected problems.
   @override
   Future<void> register({
     required String name,
@@ -163,6 +213,22 @@ class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
     }
   }
 
+  /// Resets the password for the user with the provided [email].
+  ///
+  /// This method sends a `POST` request to `/auth/reset-password` with the
+  /// user's email and new password in the request body. After processing the
+  /// response:
+  /// - If the status code is `200`, the password reset is considered successful.
+  /// - If the status code indicates an error, it parses the error response and
+  ///   throws a [ServerException] with the backend-provided message.
+  ///
+  /// Parameters:
+  /// - [email]: The email address of the user whose password is to be reset.
+  /// - [newPassword]: The new password to set for the user.
+  ///
+  /// Throws:
+  /// - [ServerException] if the password reset fails due to server error,
+  ///   validation issues, or other unexpected problems.
   @override
   Future<void> resetPassword({
     required String email,
@@ -199,6 +265,21 @@ class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
     }
   }
 
+  /// Verifies a one-time password (OTP) for the given [email].
+  ///
+  /// This method sends a `POST` request to `/auth/verify-otp` with the user's
+  /// email and OTP in the request body. After processing the response:
+  /// - If the status code is `200`, the OTP verification is successful.
+  /// - If the status code indicates an error, it parses the error response and
+  ///   throws a [ServerException] with details from the backend.
+  ///
+  /// Parameters:
+  /// - [email]: The email address of the user to verify.
+  /// - [otp]: The one-time password sent to the user's email.
+  ///
+  /// Throws:
+  /// - [ServerException] if the OTP verification fails due to server error,
+  ///   invalid OTP, or other unexpected issues.
   @override
   Future<void> verifyOTP({required String email, required String otp}) async {
     try {
@@ -230,6 +311,18 @@ class AuthRemoteDataSourceImplementation implements AuthRemoteDataSource {
     }
   }
 
+  /// Verifies whether the current session token is still valid.
+  ///
+  /// This method sends a `GET` request to `/auth/verify-token` using the
+  /// authentication headers from the cached session token. After processing the response:
+  /// - If the status code is `200`, it returns `true` or `false` depending on
+  ///   the validity of the token.
+  /// - If the status code indicates an error, it parses the error response and
+  ///   throws a [ServerException] with details from the backend.
+  ///
+  /// Throws:
+  /// - [ServerException] if token verification fails due to server error,
+  ///   invalid token, or other unexpected issues.
   @override
   Future<bool> verifyToken() async {
     try {

@@ -1,5 +1,9 @@
 part of 'auth_adapter.dart';
 
+/// Represents all possible states for the authentication flow.
+///
+/// These states are used by the `AuthAdapter` to reflect the current
+/// operation (loading, success, error, etc.) in the authentication process.
 sealed class AuthState extends Equatable {
   const AuthState();
 
@@ -7,21 +11,22 @@ sealed class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-// THE INITIAL STATE
+/// Initial state before any authentication action begins.
 final class AuthInitial extends AuthState {
   const AuthInitial();
 }
 
-// THE LOADING STATES
+/// Indicates an authentication-related process is in progress.
 final class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
-// THE SUCCESS STATES
+/// Represents the state when an OTP has been successfully sent.
 final class OTPSent extends AuthState {
   const OTPSent();
 }
 
+/// Represents the state when the user has successfully logged in.
 final class LoggedIn extends AuthState {
   const LoggedIn(this.user);
 
@@ -31,18 +36,23 @@ final class LoggedIn extends AuthState {
   List<Object?> get props => [user];
 }
 
+/// Represents the state when registration is successful.
 final class Registered extends AuthState {
   const Registered();
 }
 
+/// Represents the state when the password reset is successful.
 final class PasswordReset extends AuthState {
   const PasswordReset();
 }
 
+/// Represents the state when an OTP is successfully verified.
 final class OTPVerified extends AuthState {
   const OTPVerified();
 }
 
+/// Represents the state when a token has been verified. [isValid] indicates
+/// whether the token is valid or expired.
 final class TokenVerified extends AuthState {
   const TokenVerified(this.isValid);
 
@@ -52,8 +62,8 @@ final class TokenVerified extends AuthState {
   List<Object?> get props => [isValid];
 }
 
-// THE ERROR STATE
-class AuthError extends AuthState {
+/// Represents an error state with the provided [message].
+final class AuthError extends AuthState {
   const AuthError(this.message);
 
   final String message;

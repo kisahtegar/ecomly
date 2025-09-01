@@ -7,6 +7,34 @@ import 'package:ecomly_client/core/resources/styles/colours.dart';
 import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/core/utils/core_utils.dart';
 
+/// A reusable styled [TextFormField] for consistent input handling across the app.
+///
+/// Features:
+/// - Built-in **default validation** (`Required Field`) with optional custom validator.
+/// - Supports `enabled`, `readOnly`, and `expandable` (multi-line) modes.
+/// - Automatically adapts **text color** and **background fill color** to light/dark themes.
+///
+/// Example usage:
+/// ```dart
+/// InputField(
+///   controller: _emailController,
+///   hintText: 'Enter your email',
+///   keyboardType: TextInputType.emailAddress,
+///   validator: (value) {
+///     if (value == null || !value.contains('@')) {
+///       return 'Enter a valid email';
+///     }
+///     return null;
+///   },
+/// );
+///
+/// InputField(
+///   controller: _passwordController,
+///   hintText: 'Password',
+///   obscureText: true,
+///   suffixIcon: Icon(Icons.visibility_off),
+/// );
+/// ```
 class InputField extends StatelessWidget {
   const InputField({
     required this.controller,
@@ -15,7 +43,6 @@ class InputField extends StatelessWidget {
     this.enabled = true,
     this.readOnly = false,
     this.expandable = false,
-    super.key,
     this.suffixIcon,
     this.hintText,
     this.validator,
@@ -27,25 +54,60 @@ class InputField extends StatelessWidget {
     this.focusNode,
     this.onTap,
     this.suffixIconConstraints,
+    super.key,
   });
 
-  final Widget? suffixIcon;
-  final String? hintText;
-  final String? Function(String? value)? validator;
+  /// Controller that manages the text being edited.
   final TextEditingController controller;
-  final TextInputType? keyboardType;
+
+  /// If true, hides the text being entered (e.g., for passwords).
   final bool obscureText;
+
+  /// If true, applies a default validator (`Required Field`).
+  /// If false, only [validator] is used.
   final bool defaultValidation;
-  final List<TextInputFormatter>? inputFormatters;
-  final Widget? prefix;
+
+  /// Whether the field is interactive.
   final bool enabled;
+
+  /// Whether the field is read-only (still focusable if [onTap] is provided).
   final bool readOnly;
-  final EdgeInsetsGeometry? contentPadding;
-  final Widget? prefixIcon;
-  final FocusNode? focusNode;
-  final VoidCallback? onTap;
+
+  /// Expands input field into multi-line (1–5 lines).
   final bool expandable;
+
+  /// Optional placeholder text.
+  final String? hintText;
+
+  /// Optional validator override.
+  final String? Function(String? value)? validator;
+
+  /// Type of keyboard to use for the field.
+  final TextInputType? keyboardType;
+
+  /// Input formatters for restricting/modifying input.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// Optional widget to show before the text (not inside the border).
+  final Widget? prefix;
+
+  /// Optional widget inside the border at the start.
+  final Widget? prefixIcon;
+
+  /// Optional widget inside the border at the end.
+  final Widget? suffixIcon;
+
+  /// Constraints for the suffix icon size.
   final BoxConstraints? suffixIconConstraints;
+
+  /// Custom padding for the text content.
+  final EdgeInsetsGeometry? contentPadding;
+
+  /// Optional [FocusNode] for focus control.
+  final FocusNode? focusNode;
+
+  /// Called when the field is tapped.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +133,8 @@ class InputField extends StatelessWidget {
         ),
         hintText: hintText,
         suffixIcon: suffixIcon,
-        suffixIconConstraints: suffixIconConstraints,
         hintStyle: TextStyles.paragraphSubTextRegular3.grey,
+        suffixIconConstraints: suffixIconConstraints,
         suffixIconColor: Colours.lightThemeSecondaryTextColour,
         prefix: prefix,
         prefixIcon: prefixIcon,
