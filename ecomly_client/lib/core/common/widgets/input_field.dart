@@ -54,6 +54,8 @@ class InputField extends StatelessWidget {
     this.focusNode,
     this.onTap,
     this.suffixIconConstraints,
+    this.onTapOutside,
+    this.onSubmitted,
     super.key,
   });
 
@@ -109,6 +111,10 @@ class InputField extends StatelessWidget {
   /// Called when the field is tapped.
   final VoidCallback? onTap;
 
+  final ValueChanged<PointerDownEvent>? onTapOutside;
+
+  final ValueChanged<String>? onSubmitted;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -122,6 +128,8 @@ class InputField extends StatelessWidget {
       minLines: expandable ? 1 : null,
       style: TextStyles.paragraphSubTextRegular3.adaptiveColour(context),
       onTap: onTap,
+      onTapOutside: onTapOutside,
+      onFieldSubmitted: onSubmitted,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

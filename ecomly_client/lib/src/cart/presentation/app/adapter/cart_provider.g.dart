@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'auth_user_provider.dart';
+part of 'cart_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authUserHash() => r'6821d96dca29e87d80555e9b3f54b6d20c066ac7';
+String _$cartAdapterHash() => r'd5139b2379c98b502d473e4c0d9f89253b6e1d44';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,28 +29,30 @@ class _SystemHash {
   }
 }
 
-abstract class _$AuthUser extends BuildlessAutoDisposeNotifier<AuthUserState> {
+abstract class _$CartAdapter extends BuildlessAutoDisposeNotifier<CartState> {
   late final GlobalKey<State<StatefulWidget>>? familyKey;
 
-  AuthUserState build([GlobalKey<State<StatefulWidget>>? familyKey]);
+  CartState build([GlobalKey<State<StatefulWidget>>? familyKey]);
 }
 
-/// See also [AuthUser].
-@ProviderFor(AuthUser)
-const authUserProvider = AuthUserFamily();
+/// See also [CartAdapter].
+@ProviderFor(CartAdapter)
+const cartAdapterProvider = CartAdapterFamily();
 
-/// See also [AuthUser].
-class AuthUserFamily extends Family<AuthUserState> {
-  /// See also [AuthUser].
-  const AuthUserFamily();
+/// See also [CartAdapter].
+class CartAdapterFamily extends Family<CartState> {
+  /// See also [CartAdapter].
+  const CartAdapterFamily();
 
-  /// See also [AuthUser].
-  AuthUserProvider call([GlobalKey<State<StatefulWidget>>? familyKey]) {
-    return AuthUserProvider(familyKey);
+  /// See also [CartAdapter].
+  CartAdapterProvider call([GlobalKey<State<StatefulWidget>>? familyKey]) {
+    return CartAdapterProvider(familyKey);
   }
 
   @override
-  AuthUserProvider getProviderOverride(covariant AuthUserProvider provider) {
+  CartAdapterProvider getProviderOverride(
+    covariant CartAdapterProvider provider,
+  ) {
     return call(provider.familyKey);
   }
 
@@ -66,27 +68,27 @@ class AuthUserFamily extends Family<AuthUserState> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'authUserProvider';
+  String? get name => r'cartAdapterProvider';
 }
 
-/// See also [AuthUser].
-class AuthUserProvider
-    extends AutoDisposeNotifierProviderImpl<AuthUser, AuthUserState> {
-  /// See also [AuthUser].
-  AuthUserProvider([GlobalKey<State<StatefulWidget>>? familyKey])
+/// See also [CartAdapter].
+class CartAdapterProvider
+    extends AutoDisposeNotifierProviderImpl<CartAdapter, CartState> {
+  /// See also [CartAdapter].
+  CartAdapterProvider([GlobalKey<State<StatefulWidget>>? familyKey])
     : this._internal(
-        () => AuthUser()..familyKey = familyKey,
-        from: authUserProvider,
-        name: r'authUserProvider',
+        () => CartAdapter()..familyKey = familyKey,
+        from: cartAdapterProvider,
+        name: r'cartAdapterProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$authUserHash,
-        dependencies: AuthUserFamily._dependencies,
-        allTransitiveDependencies: AuthUserFamily._allTransitiveDependencies,
+            : _$cartAdapterHash,
+        dependencies: CartAdapterFamily._dependencies,
+        allTransitiveDependencies: CartAdapterFamily._allTransitiveDependencies,
         familyKey: familyKey,
       );
 
-  AuthUserProvider._internal(
+  CartAdapterProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -99,15 +101,15 @@ class AuthUserProvider
   final GlobalKey<State<StatefulWidget>>? familyKey;
 
   @override
-  AuthUserState runNotifierBuild(covariant AuthUser notifier) {
+  CartState runNotifierBuild(covariant CartAdapter notifier) {
     return notifier.build(familyKey);
   }
 
   @override
-  Override overrideWith(AuthUser Function() create) {
+  Override overrideWith(CartAdapter Function() create) {
     return ProviderOverride(
       origin: this,
-      override: AuthUserProvider._internal(
+      override: CartAdapterProvider._internal(
         () => create()..familyKey = familyKey,
         from: from,
         name: null,
@@ -120,13 +122,13 @@ class AuthUserProvider
   }
 
   @override
-  AutoDisposeNotifierProviderElement<AuthUser, AuthUserState> createElement() {
-    return _AuthUserProviderElement(this);
+  AutoDisposeNotifierProviderElement<CartAdapter, CartState> createElement() {
+    return _CartAdapterProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is AuthUserProvider && other.familyKey == familyKey;
+    return other is CartAdapterProvider && other.familyKey == familyKey;
   }
 
   @override
@@ -140,19 +142,19 @@ class AuthUserProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin AuthUserRef on AutoDisposeNotifierProviderRef<AuthUserState> {
+mixin CartAdapterRef on AutoDisposeNotifierProviderRef<CartState> {
   /// The parameter `familyKey` of this provider.
   GlobalKey<State<StatefulWidget>>? get familyKey;
 }
 
-class _AuthUserProviderElement
-    extends AutoDisposeNotifierProviderElement<AuthUser, AuthUserState>
-    with AuthUserRef {
-  _AuthUserProviderElement(super.provider);
+class _CartAdapterProviderElement
+    extends AutoDisposeNotifierProviderElement<CartAdapter, CartState>
+    with CartAdapterRef {
+  _CartAdapterProviderElement(super.provider);
 
   @override
   GlobalKey<State<StatefulWidget>>? get familyKey =>
-      (origin as AuthUserProvider).familyKey;
+      (origin as CartAdapterProvider).familyKey;
 }
 
 // ignore_for_file: type=lint

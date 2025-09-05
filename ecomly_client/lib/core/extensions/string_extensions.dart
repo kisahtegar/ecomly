@@ -61,4 +61,28 @@ extension StringExt on String {
     username = '${username[0]}****${username[username.length - 1]}';
     return '$username@$domain';
   }
+
+  String get initials {
+    if (isEmpty) return '';
+
+    final words = trim().split(' ');
+
+    String initials = '';
+
+    for (int i = 0; i < words.length && i < 2; i++) {
+      initials += words[i][0];
+    }
+
+    return initials.toUpperCase();
+  }
+
+  Color get colour => Color(int.parse(replaceFirst('#', 'ff'), radix: 16));
+
+  String truncateWithEllipsis(int maxLength) {
+    if (length <= maxLength) {
+      return this;
+    } else {
+      return '${substring(0, maxLength)}...';
+    }
+  }
 }

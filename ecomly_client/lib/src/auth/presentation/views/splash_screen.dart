@@ -10,12 +10,10 @@ import 'package:ecomly_client/core/resources/styles/colours.dart';
 import 'package:ecomly_client/core/services/injection_container.dart';
 import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/auth/presentation/app/adapter/auth_adapter.dart';
-import 'package:ecomly_client/src/user/app/adapter/auth_user_provider.dart';
+import 'package:ecomly_client/src/user/presentation/adapter/auth_user_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
-
-  static const path = '/login';
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
@@ -62,8 +60,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         CoreUtils.postFrameCall(() => context.go('/'));
       }
     });
-
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colours.lightThemePrimaryColour,
       body: Center(child: EcomlyLogo()),
     );

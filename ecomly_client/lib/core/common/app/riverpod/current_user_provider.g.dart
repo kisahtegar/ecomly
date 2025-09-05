@@ -8,7 +8,28 @@ part of 'current_user_provider.dart';
 
 String _$currentUserHash() => r'90c510432114c0ba028295c3b65ebe07deb0d466';
 
-/// See also [CurrentUser].
+/// A Riverpod provider that manages the current authenticated [User] across
+/// the application lifecycle.
+///
+/// This provider uses Riverpod's code generation with `@Riverpod` and is marked
+/// with `keepAlive: true` to ensure the state remains available even when not
+/// actively listened to. It exposes the current [User] object (or `null` if no
+/// user is logged in) and provides a `setUser` method to update the state.
+///
+/// Centralizing the user state in this provider allows the rest of the app to
+/// easily react to authentication changes, ensuring that user-dependent
+/// features remain consistent.
+///
+/// ## Example:
+/// ```dart
+/// // Watch the current user
+/// final user = ref.watch(currentUserProvider);
+///
+/// // Update the current user
+/// ref.read(currentUserProvider.notifier).setUser(newUser);
+/// ```
+///
+/// Copied from [CurrentUser].
 @ProviderFor(CurrentUser)
 final currentUserProvider = NotifierProvider<CurrentUser, User?>.internal(
   CurrentUser.new,

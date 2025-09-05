@@ -35,16 +35,52 @@ abstract class _$AuthAdapter extends BuildlessAutoDisposeNotifier<AuthState> {
   AuthState build([GlobalKey<State<StatefulWidget>>? familyKey]);
 }
 
-/// See also [AuthAdapter].
+/// Provider responsible for managing authentication operations.
+///
+/// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+/// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+/// methods that update the [AuthState].
+///
+/// States are updated before, during, and after async operations to reflect the
+/// current authentication status of the user.
+///
+/// Copied from [AuthAdapter].
 @ProviderFor(AuthAdapter)
 const authAdapterProvider = AuthAdapterFamily();
 
-/// See also [AuthAdapter].
+/// Provider responsible for managing authentication operations.
+///
+/// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+/// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+/// methods that update the [AuthState].
+///
+/// States are updated before, during, and after async operations to reflect the
+/// current authentication status of the user.
+///
+/// Copied from [AuthAdapter].
 class AuthAdapterFamily extends Family<AuthState> {
-  /// See also [AuthAdapter].
+  /// Provider responsible for managing authentication operations.
+  ///
+  /// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+  /// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+  /// methods that update the [AuthState].
+  ///
+  /// States are updated before, during, and after async operations to reflect the
+  /// current authentication status of the user.
+  ///
+  /// Copied from [AuthAdapter].
   const AuthAdapterFamily();
 
-  /// See also [AuthAdapter].
+  /// Provider responsible for managing authentication operations.
+  ///
+  /// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+  /// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+  /// methods that update the [AuthState].
+  ///
+  /// States are updated before, during, and after async operations to reflect the
+  /// current authentication status of the user.
+  ///
+  /// Copied from [AuthAdapter].
   AuthAdapterProvider call([GlobalKey<State<StatefulWidget>>? familyKey]) {
     return AuthAdapterProvider(familyKey);
   }
@@ -71,10 +107,28 @@ class AuthAdapterFamily extends Family<AuthState> {
   String? get name => r'authAdapterProvider';
 }
 
-/// See also [AuthAdapter].
+/// Provider responsible for managing authentication operations.
+///
+/// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+/// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+/// methods that update the [AuthState].
+///
+/// States are updated before, during, and after async operations to reflect the
+/// current authentication status of the user.
+///
+/// Copied from [AuthAdapter].
 class AuthAdapterProvider
     extends AutoDisposeNotifierProviderImpl<AuthAdapter, AuthState> {
-  /// See also [AuthAdapter].
+  /// Provider responsible for managing authentication operations.
+  ///
+  /// It connects the domain use cases ([Login], [Register], [ForgotPassword],
+  /// [VerifyOTP], [ResetPassword], [VerifyToken]) with the UI layer by exposing
+  /// methods that update the [AuthState].
+  ///
+  /// States are updated before, during, and after async operations to reflect the
+  /// current authentication status of the user.
+  ///
+  /// Copied from [AuthAdapter].
   AuthAdapterProvider([GlobalKey<State<StatefulWidget>>? familyKey])
     : this._internal(
         () => AuthAdapter()..familyKey = familyKey,
