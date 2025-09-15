@@ -16,9 +16,28 @@ import 'package:ecomly_client/src/product/domain/entities/review.dart';
 import 'package:ecomly_client/src/product/features/review/presentation/widgets/review_tile.dart';
 import 'package:ecomly_client/src/product/presentation/app/adapter/product_adapter.dart';
 
+/// A view that displays all reviews for a given [Product].
+///
+/// Features:
+/// - Fetches reviews from the server page by page.
+/// - Supports infinite scrolling using [PagingController].
+/// - Shows the product’s average rating and total review count at the top.
+/// - Each review is rendered with [ReviewTile].
+///
+/// Example:
+/// ```dart
+/// Navigator.push(
+///   context,
+///   MaterialPageRoute(
+///     builder: (_) => ProductReviews(product),
+///   ),
+/// );
+/// ```
 class ProductReviews extends ConsumerStatefulWidget {
+  /// Creates a new reviews page for the given [product].
   const ProductReviews(this.product, {super.key});
 
+  /// The product whose reviews are displayed.
   final Product product;
 
   @override
@@ -26,13 +45,20 @@ class ProductReviews extends ConsumerStatefulWidget {
 }
 
 class _ProductReviewsState extends ConsumerState<ProductReviews> {
+  /// Handles pagination for fetching [Review] items.
   final pageController = PagingController<int, Review>(firstPageKey: 1);
+
+  /// Unique key for isolating product adapter state.
   final productAdapterFamilyKey = GlobalKey();
+
+  /// Tracks the currently requested page.
   int currentPage = 1;
 
   @override
   void initState() {
     super.initState();
+
+    // When a new page is requested, fetch reviews for that page.
     pageController.addPageRequestListener((pageKey) {
       currentPage = pageKey;
       CoreUtils.postFrameCall(() {
@@ -42,14 +68,17 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
       });
     });
 
+    // Listen for product adapter state updates.
     ref.listenManual(productAdapterProvider(productAdapterFamilyKey), (
       previous,
       next,
     ) {
       if (next case ProductError(:final message)) {
+        // Display error message and mark page as errored.
         pageController.error = message;
         CoreUtils.showSnackBar(context, message: message);
       } else if (next case ReviewsFetched(:final reviews)) {
+        // Determine if this is the last page of results.
         final isLastPage = reviews.length < NetworkConstants.pageSize;
         if (isLastPage) {
           pageController.appendLastPage(reviews);
@@ -63,6 +92,7 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
 
   @override
   void dispose() {
+    // Dispose controller to avoid memory leaks.
     pageController.dispose();
     super.dispose();
   }
@@ -79,6 +109,7 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
+              /// Header showing review count and average rating.
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -92,12 +123,16 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
                 ],
               ),
               const Gap(30),
+
+              /// Paginated list of reviews.
               Expanded(
                 child: PagedListView<int, Review>.separated(
                   pagingController: pageController,
                   separatorBuilder: (_, __) => const Gap(30),
                   builderDelegate: PagedChildBuilderDelegate<Review>(
                     itemBuilder: (context, item, index) => ReviewTile(item),
+
+                    /// Loader for the first page.
                     firstPageProgressIndicatorBuilder: (_) {
                       return const Center(
                         child: CircularProgressIndicator.adaptive(
@@ -105,6 +140,8 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
                         ),
                       );
                     },
+
+                    /// Loader for subsequent pages.
                     newPageProgressIndicatorBuilder: (_) {
                       return const Center(
                         child: CircularProgressIndicator.adaptive(
@@ -112,6 +149,8 @@ class _ProductReviewsState extends ConsumerState<ProductReviews> {
                         ),
                       );
                     },
+
+                    /// Shown when no reviews exist.
                     noItemsFoundIndicatorBuilder: (_) {
                       return const Center(
                         child: EmptyData(

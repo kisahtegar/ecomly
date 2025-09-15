@@ -4,6 +4,9 @@ import 'package:ecomly_client/core/usecase/usecase.dart';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/cart/domain/repos/cart_repo.dart';
 
+/// Use case for updating the quantity of a cart product.
+///
+/// Delegates to [CartRepo.changeCartProductQuantity] to apply the new quantity.
 class ChangeCartProductQuantity
     extends FutureUsecaseWithParams<void, ChangeCartProductQuantityParams> {
   const ChangeCartProductQuantity(this._repo);
@@ -19,6 +22,9 @@ class ChangeCartProductQuantity
       );
 }
 
+/// Parameters for [ChangeCartProductQuantity].
+///
+/// Includes [userId], [cartProductId], and the [newQuantity] to set.
 class ChangeCartProductQuantityParams extends Equatable {
   const ChangeCartProductQuantityParams({
     required this.userId,

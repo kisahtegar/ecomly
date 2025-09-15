@@ -52,6 +52,17 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
 
   final http.Client _client;
 
+  /// Fetches the cart contents for a specific user.
+  ///
+  /// Sends a `GET` request to `/users/{userId}/cart` endpoint and returns a
+  /// list of [CartProductModel].
+  ///
+  /// - [userId]: The ID of the user whose cart should be fetched.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<CartProductModel>> getCart(String userId) async {
     try {
@@ -65,7 +76,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         payload as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -76,6 +90,7 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -93,6 +108,17 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Fetches the total number of items in a user's cart.
+  ///
+  /// Sends a `GET` request to `/users/{userId}/cart/count` endpoint and
+  /// returns the item count as an [int].
+  ///
+  /// - [userId]: The ID of the user whose cart count should be fetched.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<int> getCartCount(String userId) async {
     try {
@@ -106,7 +132,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         payload as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -117,6 +146,7 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       return (payload as num).toInt();
     } on ServerException {
       rethrow;
@@ -130,6 +160,18 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Fetches a single cart product by its ID for a specific user.
+  ///
+  /// Sends a `GET` request to `/users/{userId}/cart/{cartProductId}` endpoint
+  /// and returns a [CartProductModel] representing the requested cart item.
+  ///
+  /// - [userId]: The ID of the user who owns the cart.
+  /// - [cartProductId]: The ID of the cart product to retrieve.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<CartProductModel> getCartProduct({
     required String userId,
@@ -146,7 +188,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body) as DataMap;
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload);
         debugPrint(response.body);
@@ -156,6 +201,7 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       return CartProductModel.fromMap(payload);
     } on ServerException {
       rethrow;
@@ -169,6 +215,18 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Adds a product to a user's cart.
+  ///
+  /// Sends a `POST` request to `/users/{userId}/cart` endpoint with product
+  /// details such as product ID, quantity, and optional size/colour.
+  ///
+  /// - [userId]: The ID of the user who owns the cart.
+  /// - [cartProduct]: The product to add, represented as a [CartProduct].
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200` or `201`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> addToCart({
     required String userId,
@@ -192,7 +250,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
             'selectedColour': cartProduct.selectedColour!.hex,
         }),
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -215,6 +276,18 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Removes a specific product from a user's cart.
+  ///
+  /// Sends a `DELETE` request to `/users/{userId}/cart/{cartProductId}`
+  /// endpoint to remove the given cart item.
+  ///
+  /// - [userId]: The ID of the user who owns the cart.
+  /// - [cartProductId]: The ID of the cart product to remove.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200` or `204`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> removeFromCart({
     required String userId,
@@ -230,7 +303,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200 && response.statusCode != 204) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -253,6 +329,19 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Updates the quantity of a specific product in a user's cart.
+  ///
+  /// Sends a `PUT` request to `/users/{userId}/cart/{cartProductId}`
+  /// endpoint with the new quantity.
+  ///
+  /// - [userId]: The ID of the user who owns the cart.
+  /// - [cartProductId]: The ID of the cart product to update.
+  /// - [newQuantity]: The updated quantity for the cart product.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> changeCartProductQuantity({
     required String userId,
@@ -270,7 +359,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
         body: jsonEncode({'quantity': newQuantity}),
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -293,8 +385,24 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
     }
   }
 
+  /// Builds the user-specific cart endpoint path.
   String _userCartEndpoint(String userId) => '/users/$userId/cart';
 
+  /// Initiates the checkout process for a user's cart.
+  ///
+  /// Sends a `POST` request to `/checkout` endpoint with cart item details
+  /// and returns a checkout URL provided by the backend (e.g., Stripe session URL).
+  ///
+  /// - [theme]: The checkout theme (e.g., "light" or "dark"), passed as a query parameter.
+  /// - [cartItems]: The list of cart products to include in the checkout,
+  ///   represented as [CartProduct].
+  ///
+  /// Returns a [String] representing the checkout URL to redirect the user.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `201`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<String> initiateCheckout({
     required String theme,
@@ -327,7 +435,10 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
           }).toList(),
         }),
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       final payload = jsonDecode(response.body) as DataMap;
       if (response.statusCode != 201) {
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -338,6 +449,7 @@ class CartRemoteDataSrcImpl implements CartRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       return payload['url'] as String;
     } on ServerException {
       rethrow;

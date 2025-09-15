@@ -6,7 +6,14 @@ import 'package:ecomly_client/core/extensions/string_extensions.dart';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/cart/domain/entities/cart_product.dart';
 
+/// Data model for cart products.
+///
+/// Extends the [CartProduct] entity by adding serialization and
+/// deserialization logic for API and local storage operations.
+/// Used in the data layer to bridge raw data (JSON/maps) with
+/// domain entities.
 class CartProductModel extends CartProduct {
+  /// Creates a new [CartProductModel] with the given details.
   const CartProductModel({
     required super.id,
     required super.productId,
@@ -20,6 +27,9 @@ class CartProductModel extends CartProduct {
     super.selectedColour,
   });
 
+  /// Placeholder instance with default values.
+  ///
+  /// Useful for testing, mocking, or representing an empty cart product.
   const CartProductModel.empty()
     : this(
         id: "Test String",
@@ -34,9 +44,14 @@ class CartProductModel extends CartProduct {
         productOutOfStock: true,
       );
 
+  /// Creates a [CartProductModel] from a JSON string.
   factory CartProductModel.fromJson(String source) =>
       CartProductModel.fromMap(jsonDecode(source) as DataMap);
 
+  /// Creates a [CartProductModel] from a [Map].
+  ///
+  /// Handles optional fields like `selectedSize`, `selectedColour`,
+  /// and fallback values for `productExists` and `productOutOfStock`.
   CartProductModel.fromMap(DataMap map)
     : this(
         id: map['id'] as String? ?? map['_id'] as String,
@@ -51,6 +66,7 @@ class CartProductModel extends CartProduct {
         productOutOfStock: map['productOutOfStock'] as bool? ?? false,
       );
 
+  /// Returns a copy of this model with overridden values.
   CartProductModel copyWith({
     String? id,
     String? productId,
@@ -77,6 +93,7 @@ class CartProductModel extends CartProduct {
     );
   }
 
+  /// Converts this model into a [Map] for APIs or persistence.
   DataMap toMap() {
     return <String, dynamic>{
       'id': id,
@@ -90,5 +107,6 @@ class CartProductModel extends CartProduct {
     };
   }
 
+  /// Encodes this model into a JSON string.
   String toJson() => jsonEncode(toMap());
 }

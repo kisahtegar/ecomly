@@ -10,11 +10,26 @@ import 'package:ecomly_client/core/utils/global_keys.dart';
 import 'package:ecomly_client/src/cart/presentation/app/adapter/cart_provider.dart';
 import 'package:ecomly_client/src/cart/presentation/views/checkout_successful_view.dart';
 
+/// A view that displays the Stripe checkout session inside a WebView.
+///
+/// Features:
+/// - Loads the Stripe session URL provided from the backend.
+/// - Shows a loading indicator while the page loads.
+/// - Handles navigation events:
+///   - Redirects to [CheckoutSuccessfulView] when payment succeeds.
+///   - Navigates back to the cart when the user cancels.
+///   - Displays errors when web resources fail to load.
+///
+/// This is used only on **mobile platforms** (iOS/Android), since web/desktop
+/// directly open the checkout URL in an external browser.
 class CheckoutView extends ConsumerStatefulWidget {
+  /// Creates a new [CheckoutView] with the given Stripe [sessionUrl].
   const CheckoutView({required this.sessionUrl, super.key});
 
+  /// The URL for the Stripe checkout session.
   final String sessionUrl;
 
+  /// Path for navigation (used by [GoRouter]).
   static const path = '/checkout';
 
   @override
@@ -23,17 +38,21 @@ class CheckoutView extends ConsumerStatefulWidget {
 
 class _CheckoutViewState extends ConsumerState<CheckoutView> {
   late WebViewController controller;
+
+  /// Tracks whether the WebView is still loading.
   final loadingNotifier = ValueNotifier(true);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colours.lightThemeTintStockColour)
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
+            // Could be used to show a progress bar (currently unused).
             // CoreUtils.postFrameCall(() {
             //   loadingNotifier.value = true;
             // });
@@ -54,8 +73,9 @@ class _CheckoutViewState extends ConsumerState<CheckoutView> {
             );
           },
           onNavigationRequest: (NavigationRequest request) {
+            // Detect successful checkout redirect
             if (request.url.startsWith(
-              'https://dbestech.biz/payment-success',
+              'https://kisahcode.com/payment-success',
             )) {
               ref
                   .read(
@@ -69,9 +89,13 @@ class _CheckoutViewState extends ConsumerState<CheckoutView> {
                     cartAdapterProvider(GlobalKeys.cartCountFamilyKey).notifier,
                   )
                   .getCartCount(Cache.instance.userId!);
+
+              // Navigate to success screen
               context.pushReplacement(CheckoutSuccessfulView.path);
               return NavigationDecision.prevent;
-            } else if (request.url.startsWith('https://dbestech.biz/cart')) {
+            }
+            // Detect navigation back to cart
+            else if (request.url.startsWith('https://kisahcode.com/cart')) {
               context.pop();
               return NavigationDecision.prevent;
             }

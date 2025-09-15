@@ -12,9 +12,11 @@ import 'package:ecomly_client/src/product/domain/entities/category.dart';
 import 'package:ecomly_client/src/product/presentation/app/adapter/product_adapter.dart';
 import 'package:ecomly_client/src/product/presentation/app/category_notifier/category_notifier.dart';
 
+/// A horizontal list of product categories represented as [ChoiceChip]s.
 class CategorySelector extends ConsumerStatefulWidget {
   const CategorySelector({required this.categoryNotifierFamilyKey, super.key});
 
+  /// Key that identifies the [CategoryNotifier] family provider.
   final GlobalKey categoryNotifierFamilyKey;
 
   @override
@@ -22,24 +24,27 @@ class CategorySelector extends ConsumerStatefulWidget {
 }
 
 class _CategorySelectorState extends ConsumerState<CategorySelector> {
+  /// Key used to scope the [ProductAdapter] instance for fetching categories.
   final productAdapterFamilyKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+    // Fetch categories right after the first frame is built.
+    CoreUtils.postFrameCall(
+      ref
+          .read(productAdapterProvider(productAdapterFamilyKey).notifier)
+          .getCategories,
+    );
+  }
+
+  /// Updates the selected category in the [CategoryNotifier].
   void selectCategory(ProductCategory category) {
     ref
         .read(
           categoryNotifierProvider(widget.categoryNotifierFamilyKey).notifier,
         )
         .changeCategory(category);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    CoreUtils.postFrameCall(
-      ref
-          .read(productAdapterProvider(productAdapterFamilyKey).notifier)
-          .getCategories,
-    );
   }
 
   @override
@@ -51,6 +56,7 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
       categoryNotifierProvider(widget.categoryNotifierFamilyKey),
     );
 
+    // Listen for adapter state changes (errors or empty categories).
     ref.listen(productAdapterProvider(productAdapterFamilyKey), (
       previous,
       next,
@@ -69,9 +75,12 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
       }
     });
 
+    // Show loader while fetching
     if (adapterState is FetchingCategories) {
       return const LinearProgressIndicator();
-    } else if (adapterState case CategoriesFetched(:final categories)) {
+    }
+    // Show category chips once fetched
+    else if (adapterState case CategoriesFetched(:final categories)) {
       return SizedBox(
         height: 40,
         child: Theme(
@@ -79,11 +88,12 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
           child: ListView.separated(
             controller: ScrollController(),
             scrollDirection: Axis.horizontal,
-            itemCount: adapterState.categories.length + 1,
+            itemCount: categories.length + 1, // +1 for the "All" option
             separatorBuilder: (_, __) => const Gap(10),
             itemBuilder: (context, index) {
+              // Special "All" category
               if (index == 0) {
-                final selected = selectedCategory.name!.toLowerCase() == 'all';
+                final selected = selectedCategory.name?.toLowerCase() == 'all';
                 return ChoiceChip(
                   label: const Text('All'),
                   labelStyle: selected
@@ -93,15 +103,16 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
                   selectedColor: Colours.lightThemePrimaryColour,
                   showCheckmark: false,
                   backgroundColor: Colors.transparent,
-                  onSelected: (_) {
-                    selectCategory(const ProductCategory.all());
-                  },
+                  onSelected: (_) =>
+                      selectCategory(const ProductCategory.all()),
                 );
               }
+
+              // Normal categories
               final category = categories[index - 1];
               final selected = selectedCategory == category;
               return ChoiceChip(
-                label: Text(category.name!),
+                label: Text(category.name ?? ''),
                 labelStyle: selected
                     ? TextStyles.headingSemiBold1.white
                     : TextStyles.paragraphSubTextRegular1.grey,
@@ -116,6 +127,8 @@ class _CategorySelectorState extends ConsumerState<CategorySelector> {
         ),
       );
     }
+
+    // Fallback if no state applies
     return const SizedBox.shrink();
   }
 }

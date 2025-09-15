@@ -18,6 +18,17 @@ import 'package:ecomly_client/src/user/presentation/adapter/auth_user_provider.d
 import 'package:ecomly_client/src/wishlist/domain/entities/wishlist_product.dart';
 import 'package:ecomly_client/src/wishlist/presentation/app/adapter/wishlist_provider.dart';
 
+/// A widget that displays a single product in the user's wishlist.
+///
+/// Provides options to:
+/// - Navigate to the product detail page.
+/// - Remove the product from the wishlist.
+/// - Add the product to the shopping cart (if in stock).
+///
+/// Handles product availability states:
+/// - **Normal product** → Can be added to cart or opened in detail page.
+/// - **Out of stock** → Shows "OUT OF STOCK".
+/// - **Deleted product** → Shows "REMOVE" option with greyed-out styling.
 class WishlistProductTile extends ConsumerStatefulWidget {
   const WishlistProductTile(
     this.wishlistProduct, {
@@ -25,7 +36,10 @@ class WishlistProductTile extends ConsumerStatefulWidget {
     super.key,
   });
 
+  /// The wishlist entry that this tile represents.
   final WishlistProduct wishlistProduct;
+
+  /// A [GlobalKey] used to refresh the main wishlist page when an item is removed.
   final GlobalKey mainPageFamilyKey;
 
   @override
@@ -34,13 +48,64 @@ class WishlistProductTile extends ConsumerStatefulWidget {
 
 class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
   late WishlistProduct product;
+
+  /// Local provider keys for scoping Riverpod adapters to this widget.
   final wishlistAdapterFamilyKey = GlobalKey();
   final productAdapterFamilyKey = GlobalKey();
   final cartAdapterFamilyKey = GlobalKey();
 
-  /// The main product this wishlist product was formed from
+  /// The original product details (fetched from the backend if available).
   Product? originalProduct;
 
+  @override
+  void initState() {
+    super.initState();
+    product = widget.wishlistProduct;
+
+    // Fetch product details if it still exists and is in stock.
+    if (product.productExists && !product.productOutOfStock) {
+      CoreUtils.postFrameCall(() {
+        ref
+            .read(productAdapterProvider(productAdapterFamilyKey).notifier)
+            .getProduct(product.productId);
+      });
+    }
+
+    // Listen for product fetch events.
+    ref.listenManual(productAdapterProvider(productAdapterFamilyKey), (
+      previous,
+      next,
+    ) {
+      if (next case ProductFetched(:final product)) {
+        originalProduct = product;
+      }
+    });
+
+    // Listen for wishlist state changes.
+    ref.listenManual(userWishlistProvider(wishlistAdapterFamilyKey), (
+      previous,
+      next,
+    ) {
+      if (next case WishlistError(:final message)) {
+        CoreUtils.showSnackBar(context, message: '$message\nPULL TO REFRESH');
+      } else if (next is RemovedFromWishlist) {
+        CoreUtils.postFrameCall(() {
+          // Refresh the wishlist + user profile when item removed.
+          ref
+              .read(userWishlistProvider(widget.mainPageFamilyKey).notifier)
+              .getWishlist(Cache.instance.userId!);
+          ref
+              .read(authUserProvider(GlobalKey()).notifier)
+              .getUserById(Cache.instance.userId!);
+        });
+      }
+    });
+  }
+
+  /// Removes the current product from the wishlist.
+  ///
+  /// - Calls the [UserWishlist] provider's `removeFromWishlist`.
+  /// - Uses the current logged-in user ID from [Cache].
   void removeFromWishlist() {
     ref
         .read(userWishlistProvider(wishlistAdapterFamilyKey).notifier)
@@ -50,12 +115,21 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
         );
   }
 
+  /// Attempts to add the current product to the shopping cart.
+  ///
+  /// - If the product requires variant selection (colors/sizes), shows a
+  ///   [BottomSheetCard] prompting the user to go to the product page.
+  /// - If the product has no variants, it is directly added to the cart.
+  /// - If the product no longer exists, shows a red [SnackBar] instructing
+  ///   the user to remove it from their wishlist.
   Future<void> addToCart() async {
     final router = GoRouter.of(context);
+
     if (product.productExists && !product.productOutOfStock) {
       if (originalProduct == null ||
           originalProduct!.colours.isNotEmpty ||
           originalProduct!.sizes.isNotEmpty) {
+        // Product requires variant selection
         final result = await showModalBottomSheet<bool>(
           context: context,
           backgroundColor: Colors.transparent,
@@ -72,10 +146,12 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
             );
           },
         );
+
         if (result ?? false) {
           goToProductPage(router);
         }
       } else {
+        // Add directly to cart
         ref
             .read(cartAdapterProvider(cartAdapterFamilyKey).notifier)
             .addToCart(
@@ -87,6 +163,7 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
             );
       }
     } else if (!product.productExists) {
+      // Product no longer exists
       CoreUtils.showSnackBar(
         context,
         backgroundColour: Colors.red,
@@ -97,48 +174,9 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
     }
   }
 
+  /// Navigates to the product detail page for the current product.
   void goToProductPage(GoRouter router) {
     router.push('/products/${product.productId}');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    product = widget.wishlistProduct;
-    if (product.productExists && !product.productOutOfStock) {
-      CoreUtils.postFrameCall(() {
-        ref
-            .read(productAdapterProvider(productAdapterFamilyKey).notifier)
-            .getProduct(product.productId);
-      });
-    }
-    ref.listenManual(productAdapterProvider(productAdapterFamilyKey), (
-      previous,
-      next,
-    ) {
-      if (next case ProductFetched(:final product)) {
-        originalProduct = product;
-      }
-    });
-
-    ref.listenManual(userWishlistProvider(wishlistAdapterFamilyKey), (
-      previous,
-      next,
-    ) {
-      if (next case WishlistError(:final message)) {
-        CoreUtils.showSnackBar(context, message: '$message\nPULL TO REFRESH');
-      } else if (next is RemovedFromWishlist) {
-        CoreUtils.postFrameCall(() {
-          ref
-              .read(userWishlistProvider(widget.mainPageFamilyKey).notifier)
-              .getWishlist(Cache.instance.userId!);
-          ref
-              .read(authUserProvider(GlobalKey()).notifier)
-              .getUserById(Cache.instance.userId!);
-        });
-      }
-    });
   }
 
   @override
@@ -150,7 +188,9 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
     final productAdapter = ref.watch(
       productAdapterProvider(productAdapterFamilyKey),
     );
+
     final cartAdapter = ref.watch(cartAdapterProvider(cartAdapterFamilyKey));
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -174,6 +214,7 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              /// Product Image + Name + Price
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: product.productExists
@@ -221,6 +262,8 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
                 ),
               ),
               const Gap(20),
+
+              /// Remove & Add-to-Cart buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -262,6 +305,8 @@ class _WishlistProductTileState extends ConsumerState<WishlistProductTile> {
             ],
           ),
         ),
+
+        /// Special section if product no longer exists
         if (!product.productExists) ...[
           const Gap(10),
           Text(

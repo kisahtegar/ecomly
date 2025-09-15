@@ -10,9 +10,45 @@ import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/src/product/domain/entities/product.dart';
 import 'package:ecomly_client/src/product/presentation/widgets/colour_palette.dart';
 
+/// A tile widget for displaying product information in a grid layout.
+///
+/// The `ClassicProductTile` presents a [Product] in a compact, visually appealing
+/// format suitable for product listing pages. It displays the product's image,
+/// name, description, price, available colors, and a favorite toggle button.
+///
+/// Features:
+/// - **Product Image**: Network image with 228px height and rounded corners
+/// - **Favorite Button**: Positioned overlay that allows users to add/remove from wishlist
+/// - **Product Name**: Truncated to 15 characters with ellipsis if longer
+/// - **Description**: Limited to 2 lines with text overflow handling
+/// - **Price**: Formatted as currency with orange styling
+/// - **Color Palette**: Shows up to 3 available product colors as small circles
+/// - **Navigation**: Tappable area that navigates to product detail page
+/// - **Responsive Width**: Automatically sized to half screen width minus padding
+///
+/// The tile is designed for use in `GridView` or similar layouts where products
+/// need to be displayed in a compact, scannable format.
+///
+/// ### Example usage:
+/// ```dart
+/// GridView.builder(
+///   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+///     crossAxisCount: 2,
+///     childAspectRatio: 0.6,
+///   ),
+///   itemCount: products.length,
+///   itemBuilder: (context, index) {
+///     return ClassicProductTile(products[index]);
+///   },
+/// )
+/// ```
+///
+/// ### Navigation:
+/// When tapped, navigates to `/products/{productId}` using GoRouter.
 class ClassicProductTile extends StatelessWidget {
   const ClassicProductTile(this.product, {super.key});
 
+  /// The [Product] entity containing all the information to display.
   final Product product;
 
   @override

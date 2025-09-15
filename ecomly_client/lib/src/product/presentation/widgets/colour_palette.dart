@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
+/// A horizontal palette of selectable colours represented as circular swatches.
+///
+/// The [ColourPalette] widget:
+/// - Displays each colour in [colours] as a circular chip.
+/// - Allows selecting a single colour, highlighting it with a border.
+/// - Invokes [onSelect] with the selected colour (or `null` if deselected).
+/// - Can optionally scroll if [canScroll] is `true`.
+///
+/// ### Example
+/// ```dart
+/// ColourPalette(
+///   colours: [Colors.red, Colors.green, Colors.blue],
+///   radius: 16,
+///   onSelect: (color) {
+///     print('Selected: $color');
+///   },
+///   spacing: 8,
+///   padding: EdgeInsets.symmetric(horizontal: 12),
+/// )
+/// ```
 class ColourPalette extends StatefulWidget {
   const ColourPalette({
     super.key,
@@ -12,11 +32,22 @@ class ColourPalette extends StatefulWidget {
     this.padding,
   });
 
+  /// The list of [Color]s to display as selectable swatches.
   final List<Color> colours;
+
+  /// Callback invoked when a swatch is tapped. Passes the selected [Color] or `null` if deselected.
   final ValueChanged<Color?>? onSelect;
+
+  /// Radius of each colour swatch (chip size will be `radius * 2`).
   final double radius;
+
+  /// Enables horizontal scrolling if `true`. Defaults to `false` (all colours fit in one row).
   final bool canScroll;
+
+  /// Optional gap between swatches. Defaults to `2.0`.
   final double? spacing;
+
+  /// Optional padding around the palette container.
   final EdgeInsetsGeometry? padding;
 
   @override
@@ -24,6 +55,7 @@ class ColourPalette extends StatefulWidget {
 }
 
 class _ColourPaletteState extends State<ColourPalette> {
+  /// Currently selected colour (or `null` if none).
   Color? selectedColour;
 
   @override
@@ -45,10 +77,13 @@ class _ColourPaletteState extends State<ColourPalette> {
           physics: widget.canScroll
               ? null
               : const NeverScrollableScrollPhysics(),
+          itemCount: widget.colours.length,
+          separatorBuilder: (_, __) => Gap(widget.spacing ?? 2),
           itemBuilder: (context, index) {
             final colour = widget.colours[index];
             final isActive = selectedColour == colour;
-            final innerContainer = Container(
+
+            final swatch = Container(
               height: widget.radius * 2,
               width: widget.radius * 2,
               decoration: BoxDecoration(color: colour, shape: BoxShape.circle),
@@ -59,6 +94,7 @@ class _ColourPaletteState extends State<ColourPalette> {
                   ? null
                   : () {
                       Color? activeColour = colour;
+                      // Toggle selection if the same swatch is tapped again
                       if (selectedColour == activeColour) activeColour = null;
                       widget.onSelect!(activeColour);
                       setState(() {
@@ -72,13 +108,11 @@ class _ColourPaletteState extends State<ColourPalette> {
                         shape: BoxShape.circle,
                         border: Border.all(width: 2, color: colour),
                       ),
-                      child: innerContainer,
+                      child: swatch,
                     )
-                  : innerContainer,
+                  : swatch,
             );
           },
-          separatorBuilder: (_, __) => Gap(widget.spacing ?? 2),
-          itemCount: widget.colours.length,
         ),
       ),
     );

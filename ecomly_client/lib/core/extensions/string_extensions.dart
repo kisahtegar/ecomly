@@ -62,6 +62,20 @@ extension StringExt on String {
     return '$username@$domain';
   }
 
+  /// Extracts the initials from a name or phrase.
+  ///
+  /// Takes the first character of up to 2 words, converts them to uppercase,
+  /// and returns the combined initials. Useful for creating avatar placeholders
+  /// or user identification displays.
+  ///
+  /// ### Example:
+  /// ```dart
+  /// 'John Doe'.initials;           // 'JD'
+  /// 'Alice'.initials;              // 'A'
+  /// 'Mary Jane Watson'.initials;   // 'MJ' (only first 2 words)
+  /// '   '.initials;                // '' (empty/whitespace)
+  /// ''.initials;                   // '' (empty string)
+  /// ```
   String get initials {
     if (isEmpty) return '';
 
@@ -76,8 +90,39 @@ extension StringExt on String {
     return initials.toUpperCase();
   }
 
+  /// Converts a hex color string to a [Color] object.
+  ///
+  /// Parses a hex color string (with or without '#' prefix) and converts it
+  /// to a Flutter [Color]. Automatically adds full alpha (0xFF) to ensure
+  /// the color is fully opaque.
+  ///
+  /// ### Example:
+  /// ```dart
+  /// '#FF5733'.colour;    // Color(0xFFFF5733) - red-orange
+  /// 'FF5733'.colour;     // Color(0xFFFF5733) - same as above
+  /// '2196F3'.colour;     // Color(0xFF2196F3) - blue
+  /// ```
+  ///
+  /// ### Expected format:
+  /// - 6-digit hex string: 'RRGGBB' or '#RRGGBB'
+  /// - Case insensitive
   Color get colour => Color(int.parse(replaceFirst('#', 'ff'), radix: 16));
 
+  /// Truncates the string to a maximum length and adds ellipsis if needed.
+  ///
+  /// If the string length is within the [maxLength] limit, returns the original
+  /// string unchanged. Otherwise, cuts the string at [maxLength] characters
+  /// and appends '...' to indicate truncation.
+  ///
+  /// ### Example:
+  /// ```dart
+  /// 'This is a long text'.truncateWithEllipsis(10);  // 'This is a...'
+  /// 'Short'.truncateWithEllipsis(10);                // 'Short'
+  /// 'Exactly ten!'.truncateWithEllipsis(10);         // 'Exactly te...'
+  /// ```
+  ///
+  /// ### Parameters:
+  /// - [maxLength]: Maximum allowed length before truncation
   String truncateWithEllipsis(int maxLength) {
     if (length <= maxLength) {
       return this;

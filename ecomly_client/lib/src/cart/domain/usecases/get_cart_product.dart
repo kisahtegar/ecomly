@@ -5,6 +5,9 @@ import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/cart/domain/entities/cart_product.dart';
 import 'package:ecomly_client/src/cart/domain/repos/cart_repo.dart';
 
+/// Use case for retrieving a specific cart product by its ID.
+///
+/// Delegates to [CartRepo.getCartProduct] with the given user and cart product IDs.
 class GetCartProduct
     extends FutureUsecaseWithParams<CartProduct, GetCartProductParams> {
   const GetCartProduct(this._repo);
@@ -19,6 +22,9 @@ class GetCartProduct
       );
 }
 
+/// Parameters for [GetCartProduct].
+///
+/// Contains the user ID and the cart product ID to fetch.
 class GetCartProductParams extends Equatable {
   const GetCartProductParams({
     required this.userId,

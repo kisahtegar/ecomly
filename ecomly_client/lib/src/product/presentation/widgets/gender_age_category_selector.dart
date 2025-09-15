@@ -9,12 +9,28 @@ import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/core/utils/enums/gender_age_category.dart';
 import 'package:ecomly_client/src/product/presentation/app/gender_age_category_notifier/gender_age_category_notifier.dart';
 
+/// A horizontal selector for choosing a [GenderAgeCategory].
+///
+/// Displays all values of the [GenderAgeCategory] enum as [ChoiceChip] widgets
+/// and highlights the currently selected category. Selection state is managed
+/// by [GenderAgeCategoryNotifier] using Riverpod.
+///
+/// ### Example
+/// ```dart
+/// GenderAgeCategorySelector(
+///   genderAgeCategoryNotifierFamilyKey: GlobalKey(),
+/// )
+/// ```
+///
+/// Typically used in product listing or filtering UIs to allow users
+/// to switch between categories like **Men, Women, Kids, All**.
 class GenderAgeCategorySelector extends ConsumerWidget {
   const GenderAgeCategorySelector({
     required this.genderAgeCategoryNotifierFamilyKey,
     super.key,
   });
 
+  /// A unique key to scope the associated [GenderAgeCategoryNotifier] provider instance.
   final GlobalKey genderAgeCategoryNotifierFamilyKey;
 
   @override
@@ -22,6 +38,7 @@ class GenderAgeCategorySelector extends ConsumerWidget {
     final selectedGenderAgeCategory = ref.watch(
       genderAgeCategoryNotifierProvider(genderAgeCategoryNotifierFamilyKey),
     );
+
     return SizedBox(
       height: 40,
       child: Theme(
@@ -34,6 +51,7 @@ class GenderAgeCategorySelector extends ConsumerWidget {
           itemBuilder: (context, index) {
             final category = GenderAgeCategory.values[index];
             final selected = selectedGenderAgeCategory == category;
+
             return ChoiceChip(
               label: Text(category.title),
               labelStyle: selected

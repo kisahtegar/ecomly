@@ -1,7 +1,13 @@
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/product/domain/entities/review.dart';
 
+/// Data model representing a product review in the data layer.
+///
+/// Extends the [Review] entity and adds support for JSON serialization and
+/// deserialization, enabling seamless transformation between API responses
+/// and domain entities.
 class ReviewModel extends Review {
+  /// Creates a [ReviewModel] with the provided fields.
   const ReviewModel({
     required super.id,
     required super.userId,
@@ -11,6 +17,7 @@ class ReviewModel extends Review {
     required super.date,
   });
 
+  /// Provides an empty [ReviewModel] for testing or placeholders.
   ReviewModel.empty([DateTime? date])
     : this(
         id: "Test String",
@@ -21,6 +28,7 @@ class ReviewModel extends Review {
         date: date ?? DateTime.now(),
       );
 
+  /// Creates a [ReviewModel] from a JSON [Map].
   ReviewModel.fromMap(DataMap map)
     : this(
         id: map['id'] as String? ?? map['_id'] as String,
@@ -31,6 +39,20 @@ class ReviewModel extends Review {
         date: DateTime.parse(map['date'] as String),
       );
 
+  /// Converts the [ReviewModel] to a JSON-compatible [Map].
+  DataMap toMap() {
+    return {
+      'id': id,
+      'user': userId,
+      'userName': userName,
+      'comment': comment,
+      'rating': rating,
+      'date': date.toIso8601String(),
+    };
+  }
+
+  /// Creates a new [ReviewModel] by copying the current instance
+  /// and overriding selected fields.
   ReviewModel copyWith({
     String? id,
     String? userId,
@@ -47,16 +69,5 @@ class ReviewModel extends Review {
       rating: rating ?? this.rating,
       date: date ?? this.date,
     );
-  }
-
-  DataMap toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'user': userId,
-      'userName': userName,
-      'comment': comment,
-      'rating': rating,
-      'date': date.toIso8601String(),
-    };
   }
 }

@@ -22,8 +22,18 @@ import 'package:ecomly_client/src/product/domain/usecases/search_by_category_and
 part 'product_adapter.g.dart';
 part 'product_state.dart';
 
+/// Provider responsible for managing product-related operations.
+///
+/// It connects domain use cases with the UI layer by exposing methods that
+/// update the [ProductState]. Each method sets a "loading" state before the
+/// async call, then transitions to either a success state (e.g., [ProductsFetched],
+/// [ProductFetched], etc.) or [ProductError] on failure.
 @riverpod
 class ProductAdapter extends _$ProductAdapter {
+  /// Initializes dependencies and sets the initial state.
+  ///
+  /// The optional [familyKey] allows scoping multiple instances of this provider
+  /// for different parts of the app, but is unused in this implementation.
   @override
   ProductState build([GlobalKey? familyKey]) {
     _getCategories = sl<GetCategories>();
@@ -56,6 +66,11 @@ class ProductAdapter extends _$ProductAdapter {
   late SearchByCategoryAndGenderAgeCategory
   _searchByCategoryAndGenderAgeCategory;
 
+  /// Fetches all product categories.
+  ///
+  /// - Sets state to [FetchingCategories] while loading.
+  /// - On success: emits [CategoriesFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getCategories() async {
     state = const FetchingCategories();
     final result = await _getCategories();
@@ -66,6 +81,11 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches a single product category by [categoryId].
+  ///
+  /// - Sets state to [FetchingCategory] while loading.
+  /// - On success: emits [CategoryFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getCategory(String categoryId) async {
     state = const FetchingCategory();
     final result = await _getCategory(categoryId);
@@ -75,6 +95,13 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches new arrival products.
+  ///
+  /// - [page]: The page number for pagination.
+  /// - [categoryId]: Optional category filter.
+  /// - Sets state to [FetchingProducts] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getNewArrivals({required int page, String? categoryId}) async {
     state = const FetchingProducts();
     final result = await _getNewArrivals(
@@ -86,6 +113,13 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches popular products.
+  ///
+  /// - [page]: The page number for pagination.
+  /// - [categoryId]: Optional category filter.
+  /// - Sets state to [FetchingProducts] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getPopular({required int page, String? categoryId}) async {
     state = const FetchingProducts();
     final result = await _getPopular(
@@ -97,6 +131,11 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches a single product by its [productId].
+  ///
+  /// - Sets state to [FetchingProduct] while loading.
+  /// - On success: emits [ProductFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getProduct(String productId) async {
     state = const FetchingProduct();
     final result = await _getProduct(productId);
@@ -106,6 +145,13 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches reviews for a product.
+  ///
+  /// - [productId]: The product ID.
+  /// - [page]: The page number for pagination.
+  /// - Sets state to [FetchingReviews] while loading.
+  /// - On success: emits [ReviewsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getProductReviews({
     required String productId,
     required int page,
@@ -114,13 +160,18 @@ class ProductAdapter extends _$ProductAdapter {
     final result = await _getProductReviews(
       GetProductReviewsParams(productId: productId, page: page),
     );
-    result.fold((failure) => state = ProductError(failure.errorMessage), (
-      reviews,
-    ) {
-      state = ReviewsFetched(reviews);
-    });
+    result.fold(
+      (failure) => state = ProductError(failure.errorMessage),
+      (reviews) => state = ReviewsFetched(reviews),
+    );
   }
 
+  /// Fetches all products with pagination.
+  ///
+  /// - [page]: The page number.
+  /// - Sets state to [FetchingProducts] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getProducts(int page) async {
     state = const FetchingProducts();
     final result = await _getProducts(page);
@@ -130,6 +181,12 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Fetches products filtered by [categoryId].
+  ///
+  /// - [page]: The page number for pagination.
+  /// - Sets state to [FetchingProducts] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> getProductsByCategory({
     required String categoryId,
     required int page,
@@ -144,6 +201,15 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Submits a review for a product.
+  ///
+  /// - [productId]: The product being reviewed.
+  /// - [userId]: The user submitting the review.
+  /// - [comment]: The review content.
+  /// - [rating]: The numerical rating (e.g., 1–5).
+  /// - Sets state to [Reviewing] while loading.
+  /// - On success: emits [ProductReviewed].
+  /// - On failure: emits [ProductError].
   Future<void> leaveReview({
     required String productId,
     required String userId,
@@ -165,6 +231,13 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Searches all products by a query string.
+  ///
+  /// - [query]: The search keyword.
+  /// - [page]: The page number.
+  /// - Sets state to [Searching] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> searchAllProducts({
     required String query,
     required int page,
@@ -179,6 +252,14 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Searches products by category.
+  ///
+  /// - [query]: The search keyword.
+  /// - [categoryId]: The category ID to filter by.
+  /// - [page]: The page number.
+  /// - Sets state to [Searching] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> searchByCategory({
     required String query,
     required String categoryId,
@@ -194,6 +275,15 @@ class ProductAdapter extends _$ProductAdapter {
     );
   }
 
+  /// Searches products by category and gender/age group.
+  ///
+  /// - [query]: The search keyword.
+  /// - [categoryId]: The category ID to filter by.
+  /// - [genderAgeCategory]: A gender/age filter (e.g., "Men", "Women", "Kids").
+  /// - [page]: The page number.
+  /// - Sets state to [Searching] while loading.
+  /// - On success: emits [ProductsFetched].
+  /// - On failure: emits [ProductError].
   Future<void> searchByCategoryAndGenderAgeCategory({
     required String query,
     required String categoryId,

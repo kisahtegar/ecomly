@@ -9,6 +9,14 @@ import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/src/cart/domain/entities/cart_product.dart';
 import 'package:ecomly_client/src/cart/presentation/app/cart_product_notifier/cart_product_notifier.dart';
 
+/// A toggle button that selects or deselects all products for checkout.
+///
+/// This widget interacts with [CartProductNotifier] to manage selection state.
+/// - If all products are already selected, tapping the button will deselect all.
+/// - Otherwise, it will select all products.
+///
+/// It’s typically shown at the bottom of the cart screen to allow the user
+/// to quickly select all items for checkout.
 class CheckoutAllToggleButton extends ConsumerStatefulWidget {
   const CheckoutAllToggleButton({required this.allProducts, super.key});
 
@@ -23,8 +31,11 @@ class _CheckoutAllToggleButtonState
   @override
   Widget build(BuildContext context) {
     final cartProductNotifier = ref.watch(cartProductNotifierProvider);
+
+    // Determines whether all products are currently selected
     final allProductsChecked =
         cartProductNotifier.length == widget.allProducts.length;
+
     return GestureDetector(
       onTap: () {
         if (allProductsChecked) {

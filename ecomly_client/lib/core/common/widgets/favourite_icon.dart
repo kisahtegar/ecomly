@@ -10,9 +10,56 @@ import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/user/presentation/adapter/auth_user_provider.dart';
 import 'package:ecomly_client/src/wishlist/presentation/app/adapter/wishlist_provider.dart';
 
+/// A stateful heart icon button for adding/removing products from user's wishlist.
+///
+/// The `FavouriteIcon` widget provides an interactive heart icon that allows users
+/// to toggle a product's favorite status. It integrates with the app's wishlist
+/// system using Riverpod for state management and automatically updates the UI
+/// based on the current wishlist state.
+///
+/// Features:
+/// - **Interactive Toggle**: Tap to add/remove products from wishlist
+/// - **Visual Feedback**: Filled heart (favorite) vs outline heart (not favorite)
+/// - **Loading States**: Shows [CupertinoActivityIndicator] during async operations
+/// - **Error Handling**: Displays snackbar messages for wishlist operation errors
+/// - **Auto Refresh**: Automatically refreshes user data after wishlist changes
+/// - **State Persistence**: Integrates with user authentication and cache system
+///
+/// ### Visual States:
+/// - **Not Favorite**: Outline heart icon ([IconlyBroken.heart])
+/// - **Favorite**: Filled heart icon ([IconlyBold.heart])
+/// - **Loading**: Activity indicator during add/remove operations
+/// - **Color**: Uses [Colours.lightThemeSecondaryColour] for consistency
+///
+/// ### Example usage:
+/// ```dart
+/// // In a product tile or card
+/// Stack(
+///   children: [
+///     ProductImage(product.imageUrl),
+///     Positioned(
+///       top: 8,
+///       right: 8,
+///       child: FavouriteIcon(productId: product.id),
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// ```dart
+/// // As standalone widget
+/// FavouriteIcon(productId: 'product-123')
+/// ```
+///
+/// ### Dependencies:
+/// - Requires user to be authenticated ([Cache.instance.userId] not null)
+/// - Uses [currentUserProvider] for wishlist state
+/// - Integrates with [userWishlistProvider] for wishlist operations
+/// - Uses [authUserProvider] for user data refresh
 class FavouriteIcon extends ConsumerStatefulWidget {
   const FavouriteIcon({required this.productId, super.key});
 
+  /// The unique identifier of the product for wishlist operations.
   final String productId;
 
   @override

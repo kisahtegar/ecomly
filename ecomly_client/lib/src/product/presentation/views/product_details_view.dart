@@ -24,9 +24,23 @@ import 'package:ecomly_client/src/product/presentation/app/adapter/product_adapt
 import 'package:ecomly_client/src/product/presentation/widgets/colour_palette.dart';
 import 'package:ecomly_client/src/product/presentation/widgets/size_picker.dart';
 
+/// A detailed view of a single product.
+///
+/// Displays:
+/// - Product images (carousel).
+/// - Name, price, rating, and reviews count.
+/// - Available colours and sizes for selection.
+/// - Expandable description text.
+/// - Preview of customer reviews.
+/// - Add to Cart button (validates required options).
+///
+/// Also integrates:
+/// - Favourite button (wishlist).
+/// - Reactive cart icon (updates with cart changes).
 class ProductDetailsView extends ConsumerStatefulWidget {
   const ProductDetailsView(this.productId, {super.key});
 
+  /// The unique product identifier to fetch details for.
   final String productId;
 
   @override
@@ -34,21 +48,30 @@ class ProductDetailsView extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
+  /// State family key for product adapter.
   final productAdapterFamilyKey = GlobalKey();
+
+  /// State family key for cart adapter.
   final cartAdapterFamilyKey = GlobalKey();
 
+  /// The size selected by the user (if applicable).
   String? selectedSize;
+
+  /// The colour selected by the user (if applicable).
   Color? selectedColour;
 
   @override
   void initState() {
     super.initState();
+
+    /// Fetch product details when the view initializes.
     CoreUtils.postFrameCall(() {
       ref
           .read(productAdapterProvider(productAdapterFamilyKey).notifier)
           .getProduct(widget.productId);
     });
 
+    /// Listen for product fetching errors.
     ref.listenManual(productAdapterProvider(productAdapterFamilyKey), (
       previous,
       next,
@@ -65,6 +88,7 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
       }
     });
 
+    /// Listen for cart operations (errors/success).
     ref.listenManual(cartAdapterProvider(cartAdapterFamilyKey), (
       previous,
       next,
@@ -104,18 +128,22 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
       ),
       body: Builder(
         builder: (context) {
+          /// Show loading spinner while fetching product
           if (productState is FetchingProduct) {
             return const Center(
               child: CircularProgressIndicator.adaptive(
                 backgroundColor: Colours.lightThemePrimaryColour,
               ),
             );
-          } else if (productState case ProductFetched(:final product)) {
+          }
+          /// Render product details once fetched
+          else if (productState case ProductFetched(:final product)) {
             return Column(
               children: [
                 Expanded(
                   child: ListView(
                     children: [
+                      /// Product image carousel
                       Builder(
                         builder: (context) {
                           var images = product.images;
@@ -145,6 +173,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                           );
                         },
                       ),
+
+                      /// Product name, price, rating
                       Padding(
                         padding: const EdgeInsets.all(20).copyWith(bottom: 2),
                         child: Column(
@@ -183,9 +213,7 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                                       .adaptiveColour(context),
                                 ),
                                 Text(
-                                  ' ('
-                                  '${product.numberOfReviews.pluralizeReviews}'
-                                  ')',
+                                  ' (${product.numberOfReviews.pluralizeReviews})',
                                   style: const TextStyle(
                                     color:
                                         Colours.lightThemeSecondaryTextColour,
@@ -196,6 +224,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                           ],
                         ),
                       ),
+
+                      /// Divider
                       Divider(
                         color: CoreUtils.adaptiveColour(
                           context,
@@ -204,12 +234,15 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                         ),
                       ),
                       const Gap(10),
+
+                      /// Colours, sizes, description, reviews preview
                       Padding(
                         padding: const EdgeInsets.all(20).copyWith(top: 0),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            /// Colour palette
                             if (product.colours.isNotEmpty)
                               ColourPalette(
                                 colours: product.colours,
@@ -221,6 +254,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                                   selectedColour = colour;
                                 },
                               ),
+
+                            /// Size picker
                             if (product.sizes.isNotEmpty) ...[
                               const Gap(15),
                               SizePicker(
@@ -234,6 +269,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                               ),
                             ],
                             const Gap(20),
+
+                            /// Description
                             Text(
                               'Description',
                               style: TextStyles.headingMedium3.adaptiveColour(
@@ -247,6 +284,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                               style: TextStyles.paragraphRegular.grey,
                             ),
                             const Gap(20),
+
+                            /// Reviews preview
                             ReviewsPreview(product: product),
                           ],
                         ),
@@ -254,11 +293,14 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                     ],
                   ),
                 ),
+
+                /// Add to Cart button
                 Padding(
                   padding: const EdgeInsets.all(20).copyWith(bottom: 40),
                   child: RoundedButton(
                     height: 50,
                     onPressed: () {
+                      /// Validate required selections
                       if (product.colours.isNotEmpty &&
                           selectedColour == null) {
                         CoreUtils.showSnackBar(
@@ -276,9 +318,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
                         );
                         return;
                       }
-                      debugPrint(
-                        '[ProductDetailsView/addToCart]: selectedSize = $selectedSize, selectedColour = $selectedColour',
-                      );
+
+                      /// Add to cart request
                       ref
                           .read(
                             cartAdapterProvider(cartAdapterFamilyKey).notifier,
@@ -303,6 +344,8 @@ class _ProductDetailsViewState extends ConsumerState<ProductDetailsView> {
               ],
             );
           }
+
+          /// Default: render nothing
           return const SizedBox.shrink();
         },
       ),

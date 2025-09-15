@@ -4,6 +4,9 @@ import 'package:ecomly_client/core/usecase/usecase.dart';
 import 'package:ecomly_client/core/utils/typedefs.dart';
 import 'package:ecomly_client/src/cart/domain/repos/cart_repo.dart';
 
+/// Use case for removing a product from the cart.
+///
+/// Delegates to [CartRepo.removeFromCart] with the provided user and product IDs.
 class RemoveFromCart
     extends FutureUsecaseWithParams<void, RemoveFromCartParams> {
   const RemoveFromCart(this._repo);
@@ -17,6 +20,9 @@ class RemoveFromCart
   );
 }
 
+/// Parameters for [RemoveFromCart].
+///
+/// Contains [userId] and [cartProductId] to identify the cart item to remove.
 class RemoveFromCartParams extends Equatable {
   const RemoveFromCartParams({
     required this.userId,

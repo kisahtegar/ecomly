@@ -15,6 +15,19 @@ import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/product/domain/entities/product.dart';
 import 'package:ecomly_client/src/product/presentation/app/adapter/product_adapter.dart';
 
+/// A widget that allows the current user to submit a review for a [Product].
+///
+/// Includes:
+/// - A star rating input (1–5).
+/// - A text input field for the review.
+/// - A "POST" button that submits the review.
+///
+/// After submission:
+/// - Clears the input fields.
+/// - Refreshes the product's reviews via [ProductAdapter].
+///
+/// Displays the current user's avatar and name at the top,
+/// followed by rating stars, a text input, and the submission button.
 class ProductReviewInput extends StatefulWidget {
   const ProductReviewInput(
     this.product, {
@@ -22,7 +35,11 @@ class ProductReviewInput extends StatefulWidget {
     super.key,
   });
 
+  /// The product being reviewed.
   final Product product;
+
+  /// A unique [GlobalKey] used to scope the [ProductAdapter] for refreshing the
+  /// reviews list after submission.
   final GlobalKey reviewsFamilyKey;
 
   @override
@@ -30,8 +47,13 @@ class ProductReviewInput extends StatefulWidget {
 }
 
 class _ProductReviewInputState extends State<ProductReviewInput> {
+  /// Stores the selected star rating (0–5).
   final ratingNotifier = ValueNotifier<double>(0);
+
+  /// Controls the review text input.
   final controller = TextEditingController();
+
+  /// Local key for scoping [ProductAdapter] when posting a review.
   final productAdapterFamilyKey = GlobalKey();
 
   @override
@@ -46,10 +68,13 @@ class _ProductReviewInputState extends State<ProductReviewInput> {
     return Consumer(
       builder: (_, ref, __) {
         final user = ref.watch(currentUserProvider);
+
+        /// Watches the state of the [ProductAdapter] tied to [productAdapterFamilyKey].
         final productAdapter = ref.watch(
           productAdapterProvider(productAdapterFamilyKey),
         );
 
+        /// Listens for state changes in the [ProductAdapter].
         ref.listen(productAdapterProvider(productAdapterFamilyKey), (
           previous,
           next,
@@ -68,11 +93,13 @@ class _ProductReviewInputState extends State<ProductReviewInput> {
             });
           }
         });
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// User avatar + name + info text
             Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,6 +139,8 @@ class _ProductReviewInputState extends State<ProductReviewInput> {
               ],
             ),
             const Gap(15),
+
+            /// Star rating input
             ValueListenableBuilder(
               valueListenable: ratingNotifier,
               builder: (_, value, __) {
@@ -155,6 +184,8 @@ class _ProductReviewInputState extends State<ProductReviewInput> {
               },
             ),
             const Gap(25),
+
+            /// Review text input
             InputField(
               controller: controller,
               expandable: true,
@@ -165,6 +196,8 @@ class _ProductReviewInputState extends State<ProductReviewInput> {
               ),
             ),
             const Gap(16),
+
+            /// Submit button
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Colours.lightThemePrimaryColour,

@@ -21,9 +21,11 @@ import 'package:ecomly_client/src/cart/presentation/widgets/cart_product_tile.da
 import 'package:ecomly_client/src/cart/presentation/widgets/checkout_all_toggle_button.dart';
 import 'package:ecomly_client/src/cart/presentation/widgets/checkout_button.dart';
 
+/// The main screen for viewing and managing the user's shopping cart.
 class CartView extends ConsumerStatefulWidget {
   const CartView({super.key});
 
+  /// Path for navigation (used by [GoRouter]).
   static const path = '/cart';
 
   @override
@@ -32,19 +34,16 @@ class CartView extends ConsumerStatefulWidget {
 
 class _CartViewState extends ConsumerState<CartView> {
   final cartAdapterFamilyKey = GlobalKeys.cartScreenAdapterFamilyKey;
-  bool removingBulkProducts = false;
 
-  Future<void> getCart() async {
-    return ref
-        .read(cartAdapterProvider(cartAdapterFamilyKey).notifier)
-        .getCart(Cache.instance.userId!);
-  }
+  /// Tracks whether bulk product removal is in progress.
+  bool removingBulkProducts = false;
 
   @override
   void initState() {
     super.initState();
     CoreUtils.postFrameCall(getCart);
 
+    // Listen to cart state updates and react to errors or removals
     ref.listenManual(cartAdapterProvider(cartAdapterFamilyKey), (
       previous,
       next,
@@ -60,10 +59,18 @@ class _CartViewState extends ConsumerState<CartView> {
     });
   }
 
+  /// Fetches the cart items for the current user.
+  Future<void> getCart() async {
+    return ref
+        .read(cartAdapterProvider(cartAdapterFamilyKey).notifier)
+        .getCart(Cache.instance.userId!);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartAdapter = ref.watch(cartAdapterProvider(cartAdapterFamilyKey));
     final cartProductNotifier = ref.watch(cartProductNotifierProvider);
+
     return RefreshIndicator.adaptive(
       onRefresh: getCart,
       child: Scaffold(
@@ -73,6 +80,8 @@ class _CartViewState extends ConsumerState<CartView> {
           actions: [
             const SearchButton(),
             const Gap(5),
+
+            /// Bulk delete button (only visible if products are selected)
             if (cartProductNotifier.isNotEmpty)
               IconButton(
                 onPressed: () async {
@@ -109,6 +118,7 @@ class _CartViewState extends ConsumerState<CartView> {
         body: SafeArea(
           child: Builder(
             builder: (context) {
+              // Loading state (bulk remove, fetching, or removing)
               if (removingBulkProducts ||
                   cartAdapter is FetchingCart ||
                   cartAdapter is RemovingFromCart) {
@@ -119,8 +129,10 @@ class _CartViewState extends ConsumerState<CartView> {
                 );
               }
 
+              // Success: cart fetched
               if (cartAdapter case CartFetched(:final cart)) {
                 if (cart.isEmpty) {
+                  // Empty cart view
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -139,8 +151,10 @@ class _CartViewState extends ConsumerState<CartView> {
                   );
                 }
 
+                // Cart with items
                 return Column(
                   children: [
+                    /// Header with item count and toggle
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -158,6 +172,8 @@ class _CartViewState extends ConsumerState<CartView> {
                         ],
                       ),
                     ),
+
+                    /// List of products
                     Expanded(
                       child: ListView.separated(
                         padding: const EdgeInsets.all(16),
@@ -172,15 +188,19 @@ class _CartViewState extends ConsumerState<CartView> {
                         separatorBuilder: (_, __) => const Gap(20),
                       ),
                     ),
+
+                    /// Checkout button
                     CheckoutButton(products: cart),
                   ],
                 );
               }
 
+              // Error state
               if (cartAdapter is CartError) {
                 return Center(child: Lottie.asset(Media.error));
               }
 
+              // Default (initial/empty state)
               return const SizedBox.shrink();
             },
           ),

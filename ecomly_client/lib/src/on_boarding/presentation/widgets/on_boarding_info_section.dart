@@ -10,11 +10,35 @@ import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/core/services/injection_container.dart';
 import 'package:ecomly_client/src/auth/presentation/views/login_screen.dart';
 
+/// A section widget displayed during the **onboarding flow**, showing
+/// promotional text, a background image, and a "Get Started" button.
+///
+/// There are **two variants**:
+/// - [OnBoardingInfoSection.first] → shows female image + "Winter Sale" copy.
+/// - [OnBoardingInfoSection.second] → shows male image + "Flash Sale" copy.
+///
+/// ### Behavior:
+/// - The background image changes depending on the variant.
+/// - The promotional text differs between the first and second section.
+/// - The "Get Started" button:
+///   1. Marks onboarding as completed (`cacheFirstTimer()`).
+///   2. Redirects the user to the [LoginScreen].
+///
+/// ### Example:
+/// ```dart
+/// PageView(
+///   children: const [
+///     OnBoardingInfoSection.first(),
+///     OnBoardingInfoSection.second(),
+///   ],
+/// )
+/// ```
 class OnBoardingInfoSection extends StatelessWidget {
   const OnBoardingInfoSection.first({super.key}) : first = true;
 
   const OnBoardingInfoSection.second({super.key}) : first = false;
 
+  /// Determines which variant of the onboarding section to show.
   final bool first;
 
   @override
@@ -23,10 +47,14 @@ class OnBoardingInfoSection extends StatelessWidget {
       clipBehavior: Clip.none,
       alignment: AlignmentDirectional.center,
       children: [
+        // Background image (different per variant)
         Image.asset(first ? Media.onBoardingFemale : Media.onBoardingMale),
+
+        // Promotional text + CTA button
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Title / promotional copy
             switch (first) {
               true => Text.rich(
                 textAlign: TextAlign.left,
@@ -65,6 +93,8 @@ class OnBoardingInfoSection extends StatelessWidget {
                 ),
               ),
             },
+
+            // CTA Button
             RoundedButton(
               text: 'Get Started',
               onPressed: () {

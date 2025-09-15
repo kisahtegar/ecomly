@@ -7,6 +7,45 @@ import 'package:ecomly_client/core/resources/styles/colours.dart';
 import 'package:ecomly_client/core/resources/styles/text_styles.dart';
 import 'package:ecomly_client/core/utils/core_utils.dart';
 
+/// A reusable bottom sheet card widget for confirmation dialogs.
+///
+/// This widget creates a styled modal card with a [title] and two action buttons
+/// (positive and negative) arranged horizontally. It's designed to be used within
+/// a bottom sheet for user confirmations, selections, or binary choices.
+///
+/// Features:
+/// - Adaptive theming (automatically adjusts background color for light/dark modes)
+/// - Rounded corners with Material Design styling
+/// - Two customizable action buttons with optional color overrides
+/// - Returns `true` when positive button is pressed, `false` for negative button
+/// - Automatically pops the navigation context when buttons are pressed
+///
+/// ### Example usage:
+/// ```dart
+/// showModalBottomSheet<bool>(
+///   context: context,
+///   builder: (context) => const BottomSheetCard(
+///     title: 'Delete this item?',
+///     positiveButtonText: 'Delete',
+///     negativeButtonText: 'Cancel',
+///     positiveButtonColour: Colors.red,
+///   ),
+/// ).then((result) {
+///   if (result == true) {
+///     // User confirmed - perform delete action
+///   }
+/// });
+/// ```
+///
+/// ```dart
+/// BottomSheetCard(
+///   title: 'Save changes before leaving?',
+///   positiveButtonText: 'Save',
+///   negativeButtonText: 'Discard',
+///   positiveButtonColour: Colors.green,
+///   negativeButtonColour: Colors.grey,
+/// );
+/// ```
 class BottomSheetCard extends StatelessWidget {
   const BottomSheetCard({
     super.key,
@@ -17,10 +56,27 @@ class BottomSheetCard extends StatelessWidget {
     this.negativeButtonColour,
   });
 
+  /// The main message or question displayed at the top of the card.
   final String title;
+
+  /// The text displayed on the positive action button (right side).
+  ///
+  /// When pressed, returns `true` to the calling context.
   final String positiveButtonText;
+
+  /// The text displayed on the negative action button (left side).
+  ///
+  /// When pressed, returns `false` to the calling context.
   final String negativeButtonText;
+
+  /// Optional background color override for the positive button.
+  ///
+  /// If `null`, uses the default [RoundedButton] styling.
   final Color? positiveButtonColour;
+
+  /// Optional background color override for the negative button.
+  ///
+  /// If `null`, uses the default [RoundedButton] styling.
   final Color? negativeButtonColour;
 
   @override

@@ -4,6 +4,45 @@ import 'package:flutter/material.dart';
 import 'package:ecomly_client/core/extensions/context_extensions.dart';
 import 'package:ecomly_client/core/resources/styles/colours.dart';
 
+/// A text widget that automatically truncates long content and provides
+/// a "More"/"Less" toggle for expanding/collapsing the full text.
+///
+/// The `ExpandableText` is useful for displaying long descriptions, reviews,
+/// or content where screen space is limited. It initially shows only the first
+/// 2 lines of text, and if the content exceeds this limit, it adds a "More"
+/// link that users can tap to view the full text.
+///
+/// Features:
+/// - **Automatic Truncation**: Shows first 2 lines by default
+/// - **Smart Detection**: Only shows expand/collapse if text actually exceeds 2 lines
+/// - **Toggle Interaction**: "More" expands, "Less" collapses the text
+/// - **Custom Styling**: Accepts optional [TextStyle] override
+/// - **Responsive Width**: Uses 90% of the available screen width for layout calculation
+/// - **Accessible**: Uses [TapGestureRecognizer] for proper touch handling
+///
+/// ### Example usage:
+/// ```dart
+/// ExpandableText(
+///   context,
+///   text: 'This is a very long product description that will be truncated...'
+///       'and users can tap More to see the full content.',
+///   style: TextStyle(fontSize: 14, color: Colors.grey),
+/// )
+/// ```
+///
+/// ```dart
+/// // With default styling
+/// ExpandableText(
+///   context,
+///   text: longProductDescription,
+/// )
+/// ```
+///
+/// ### Behavior:
+/// - If text fits in 2 lines or less: Shows full text without "More" link
+/// - If text exceeds 2 lines: Shows truncated text with "More" link
+/// - When expanded: Shows full text with "Less" link
+/// - Toggle state is preserved during widget rebuilds
 class ExpandableText extends StatefulWidget {
   const ExpandableText(
     this.context, {
@@ -12,8 +51,19 @@ class ExpandableText extends StatefulWidget {
     this.style,
   });
 
+  /// The [BuildContext] used for responsive width calculations.
+  ///
+  /// This is required to determine the available screen width for text layout
+  /// measurement. The widget uses 90% of the screen width for calculations.
   final BuildContext context;
+
+  /// The text content to display.
+  ///
+  /// This string will be automatically truncated if it exceeds 2 lines
+  /// when rendered with the specified [style] and available width.
   final String text;
+
+  /// Optional custom text styling.
   final TextStyle? style;
 
   @override

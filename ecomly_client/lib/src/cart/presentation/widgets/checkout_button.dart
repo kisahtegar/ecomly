@@ -15,6 +15,15 @@ import 'package:ecomly_client/src/cart/presentation/app/adapter/cart_provider.da
 import 'package:ecomly_client/src/cart/presentation/app/cart_product_notifier/cart_product_notifier.dart';
 import 'package:ecomly_client/src/cart/presentation/views/checkout_view.dart';
 
+/// A button that initiates the checkout process.
+///
+/// - Displays the total price of either all cart products or only the selected
+///   products (if any are selected).
+/// - Initiates checkout through the [CartAdapter].
+/// - Listens for checkout events:
+///   - On success: navigates to the [CheckoutView] (mobile)
+///     or opens a Stripe checkout URL (web/desktop).
+///   - On error: shows a snackbar with an error message.
 class CheckoutButton extends ConsumerStatefulWidget {
   const CheckoutButton({required this.products, super.key});
 
@@ -30,30 +39,37 @@ class _CheckoutButtonState extends ConsumerState<CheckoutButton> {
   @override
   void initState() {
     super.initState();
+
+    // Manually listen to checkout state changes.
     ref.listenManual(cartAdapterProvider(cartAdapterFamilyKey), (
       previous,
       next,
     ) {
       if (next case CheckoutInitiated(:final stripeCheckoutSessionUrl)) {
         debugPrint('-------------INITIATING CHECKOUT-----------------');
+
+        // Handle checkout redirection depending on platform.
         CoreUtils.postFrameCall(() async {
           if (defaultTargetPlatform == TargetPlatform.android ||
               defaultTargetPlatform == TargetPlatform.iOS) {
+            // Navigate to CheckoutView inside the app
             context.push(CheckoutView.path, extra: stripeCheckoutSessionUrl);
           } else {
+            // Open checkout URL in browser (web/desktop)
             if (!await launchUrl(Uri.parse(stripeCheckoutSessionUrl))) {
               debugPrint('ERROR: Could not launch Stripe checkout url');
               if (!mounted) return;
               CoreUtils.showSnackBar(
                 context,
                 message:
-                    'Error Occurred, '
-                    'Please try again.\nIf issue persists, contact support.',
+                    'Error Occurred, Please try again.\n'
+                    'If issue persists, contact support.',
               );
             }
           }
         });
       } else if (next case CartError(:final message)) {
+        // Show error messages when checkout fails
         CoreUtils.showSnackBar(context, message: message);
       }
     });
@@ -64,9 +80,12 @@ class _CheckoutButtonState extends ConsumerState<CheckoutButton> {
     final cartProductNotifier = ref.watch(cartProductNotifierProvider);
     final cartAdapter = ref.watch(cartAdapterProvider(cartAdapterFamilyKey));
 
+    // Determine whether to use all products or only selected ones
     final selectedProducts = widget.products.where(
       (product) => cartProductNotifier.contains(product.id),
     );
+
+    // Calculate the total amount
     double total = 0;
     if (cartProductNotifier.isEmpty) {
       total = widget.products.fold<double>(
@@ -80,6 +99,7 @@ class _CheckoutButtonState extends ConsumerState<CheckoutButton> {
       );
     }
 
+    // Checkout button with dynamic total
     return Padding(
       padding: const EdgeInsets.all(20).copyWith(bottom: 40),
       child: RoundedButton(

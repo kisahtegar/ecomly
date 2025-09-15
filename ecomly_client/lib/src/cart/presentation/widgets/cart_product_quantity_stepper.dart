@@ -10,7 +10,15 @@ import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/cart/presentation/app/adapter/cart_provider.dart';
 import 'package:ecomly_client/src/cart/presentation/widgets/cart_product_quantity_stepper_icon.dart';
 
+/// A quantity stepper widget for cart products.
+///
+/// Displays decrement and increment buttons along with the current quantity.
+/// Integrates with [CartAdapter] to handle updates, fetch fresh values, and
+/// display errors when necessary.
+///
+/// Typically used inside the cart screen for each product.
 class CartProductQuantityStepper extends ConsumerStatefulWidget {
+  /// Creates a quantity stepper with an initial quantity and callbacks.
   const CartProductQuantityStepper(
     this.initialQuantity, {
     required this.counterKey,
@@ -19,9 +27,19 @@ class CartProductQuantityStepper extends ConsumerStatefulWidget {
     super.key,
   });
 
-  final int initialQuantity;
-  final GlobalKey counterKey;
+  /// The ID of the cart product this stepper is tied to.
   final String cartProductId;
+
+  /// A unique [GlobalKey] to scope the `CartAdapter` provider.
+  final GlobalKey counterKey;
+
+  /// The quantity value shown at widget initialization.
+  final int initialQuantity;
+
+  /// Triggered whenever the quantity changes.
+  ///
+  /// - If the quantity is updated, passes the new value.
+  /// - If no update is needed, passes `null`.
   final void Function(int? newQuantity) onStep;
 
   @override
@@ -33,19 +51,12 @@ class _CartProductQuantityStepperState
   late int initialQuantity;
   late ValueNotifier<int> quantityNotifier;
 
-  void getCartProduct() {
-    ref
-        .read(cartAdapterProvider(widget.counterKey).notifier)
-        .getCartProduct(
-          userId: Cache.instance.userId!,
-          cartProductId: widget.cartProductId,
-        );
-  }
-
   @override
   void initState() {
     super.initState();
     initialQuantity = widget.initialQuantity;
+
+    // Tracks the quantity value and invokes [onStep] whenever it changes.
     quantityNotifier = ValueNotifier(widget.initialQuantity)
       ..addListener(() {
         if (quantityNotifier.value != initialQuantity) {
@@ -56,9 +67,21 @@ class _CartProductQuantityStepperState
       });
   }
 
+  /// Fetches the latest value of this cart product from the backend using the [CartAdapter].
+  void getCartProduct() {
+    ref
+        .read(cartAdapterProvider(widget.counterKey).notifier)
+        .getCartProduct(
+          userId: Cache.instance.userId!,
+          cartProductId: widget.cartProductId,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartAdapter = ref.watch(cartAdapterProvider(widget.counterKey));
+
+    // Listen for cart state changes and react accordingly.
     ref.listen(cartAdapterProvider(widget.counterKey), (previous, next) {
       if (next is ChangedCartProductQuantity) {
         CoreUtils.postFrameCall(getCartProduct);
@@ -84,6 +107,8 @@ class _CartProductQuantityStepperState
         });
       }
     });
+
+    // Show a loading spinner while the quantity update is in progress.
     if (cartAdapter is ChangingCartProductQuantity) {
       return const Center(
         child: CircularProgressIndicator.adaptive(
@@ -91,6 +116,8 @@ class _CartProductQuantityStepperState
         ),
       );
     }
+
+    // UI layout for the quantity stepper.
     return SizedBox(
       width: 127,
       child: ClipRRect(

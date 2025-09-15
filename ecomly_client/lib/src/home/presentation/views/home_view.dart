@@ -11,9 +11,11 @@ import 'package:ecomly_client/src/product/presentation/views/all_new_arrivals_vi
 import 'package:ecomly_client/src/product/presentation/views/all_popular_products_view.dart';
 import 'package:ecomly_client/src/product/presentation/views/search_view.dart';
 
+/// The **Home screen** of the app.
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
+  /// The route path for navigation.
   static const path = '/home';
 
   @override
@@ -25,11 +27,13 @@ class HomeView extends StatelessWidget {
         child: Column(
           children: [
             const Gap(40),
+            // Search bar (navigates to full search page when tapped).
             SearchSection(
               readOnly: true,
               onTap: () => context.push(SearchView.path),
             ),
             const Gap(20),
+            // Scrollable content
             Expanded(
               child: ListView(
                 children: [

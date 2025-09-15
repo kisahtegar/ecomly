@@ -9,9 +9,15 @@ import 'package:ecomly_client/src/product/presentation/app/category_notifier/cat
 import 'package:ecomly_client/src/product/presentation/widgets/category_selector.dart';
 import 'package:ecomly_client/src/product/presentation/widgets/paginated_product_grid_view.dart';
 
+/// View displaying **all popular products** with category filtering.
+///
+/// This screen uses [CategorySelector] to let users filter products by category
+/// and [PaginatedProductGridView] to handle infinite scrolling. It will Displays
+/// only "Popular" products and Supports category-based filtering (defaults to "All").
 class AllPopularProductsView extends ConsumerStatefulWidget {
   const AllPopularProductsView({super.key});
 
+  /// Static route path for navigation.
   static const path = 'popular';
 
   @override
@@ -20,17 +26,26 @@ class AllPopularProductsView extends ConsumerStatefulWidget {
 
 class _AllPopularProductsViewState
     extends ConsumerState<AllPopularProductsView> {
+  /// Family key for category state (used by [CategoryNotifier]).
   final categoryNotifierFamilyKey = GlobalKey();
+
+  /// Family key for product adapter state (used by [ProductAdapter]).
   final productAdapterFamilyKey = GlobalKey();
 
+  /// Fetches popular products for the given [page].
+  ///
+  /// If a category is selected (other than "All"), its [id] is passed. Otherwise,
+  /// all popular products are fetched without filtering.
   Future<void> getProducts(int page) async {
     final category = ref.watch(
       categoryNotifierProvider(categoryNotifierFamilyKey),
     );
+
     String? categoryId;
     if (category.name?.toLowerCase() != 'all') {
       categoryId = category.id;
     }
+
     ref
         .read(productAdapterProvider(productAdapterFamilyKey).notifier)
         .getPopular(page: page, categoryId: categoryId);
@@ -47,6 +62,7 @@ class _AllPopularProductsViewState
       body: SafeArea(
         child: Column(
           children: [
+            /// Category selection bar
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20,
@@ -56,6 +72,8 @@ class _AllPopularProductsViewState
               ),
             ),
             const Gap(20),
+
+            /// Paginated grid displaying products
             Expanded(
               child: PaginatedProductGridView(
                 productAdapterFamilyKey: productAdapterFamilyKey,

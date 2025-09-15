@@ -5,6 +5,24 @@ import 'package:ecomly_client/core/common/widgets/input_field.dart';
 import 'package:ecomly_client/core/extensions/context_extensions.dart';
 import 'package:ecomly_client/core/resources/styles/colours.dart';
 
+/// A reusable **search bar widget** used in Home and Search screens.
+///
+/// It is wrapped in a [Hero] widget with the tag `'/search-section'` to provide
+/// a smooth transition when navigating to a dedicated search page.
+///
+/// ### Example:
+/// ```dart
+/// SearchSection(
+///   readOnly: true,
+///   onTap: () => context.push(SearchView.path),
+/// )
+///
+/// SearchSection(
+///   controller: myController,
+///   onSubmitted: (query) => searchProducts(query),
+///   suffixIcon: Icon(Icons.mic),
+/// )
+/// ```
 class SearchSection extends StatefulWidget {
   const SearchSection({
     super.key,
@@ -15,10 +33,19 @@ class SearchSection extends StatefulWidget {
     this.onSubmitted,
   });
 
+  /// Optional external [TextEditingController].
   final TextEditingController? controller;
+
+  /// Callback for when the user submits the search.
   final ValueChanged<String>? onSubmitted;
+
+  /// Callback when the field is tapped.
   final VoidCallback? onTap;
+
+  /// If true, disables text input but keeps the tap interaction.
   final bool readOnly;
+
+  /// Custom widget to show at the end of the field.
   final Widget? suffixIcon;
 
   @override
@@ -49,6 +76,7 @@ class _SearchSectionState extends State<SearchSection> {
     return Hero(
       tag: '/search-section',
       flightShuttleBuilder: (context, __, ___, ____, _____) {
+        // Smooth Hero animation: transition background to match destination
         return Material(
           color: context.theme.scaffoldBackgroundColor,
           child: const SearchSection(readOnly: true),
@@ -68,6 +96,7 @@ class _SearchSectionState extends State<SearchSection> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Divider color adapts to focus state
               ListenableBuilder(
                 listenable: focusNode,
                 builder: (context, __) {
@@ -81,6 +110,7 @@ class _SearchSectionState extends State<SearchSection> {
                   );
                 },
               ),
+              // Show custom suffix icon if provided, else fallback to filter icon
               if (widget.suffixIcon != null)
                 widget.suffixIcon!
               else

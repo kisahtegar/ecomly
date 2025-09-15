@@ -11,17 +11,38 @@ import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/product/domain/entities/product.dart';
 import 'package:ecomly_client/src/product/presentation/widgets/colour_palette.dart';
 
+/// A tile widget representing a product in the **Home screen**.
+///
+/// Displays:
+/// - Product image with a [FavouriteIcon] overlay
+/// - Product name (truncated if too long)
+/// - Price
+/// - Available colour swatches (up to 3)
+/// - Rating (with star icon)
+///
+/// Navigates to the product details page when tapped.
+///
+/// ### Example:
+/// ```dart
+/// HomeProductTile(
+///   product,
+///   margin: EdgeInsets.only(right: 16),
+/// )
+/// ```
 class HomeProductTile extends StatelessWidget {
   const HomeProductTile(this.product, {super.key, this.margin});
 
+  /// The product entity containing details to display.
   final Product product;
+
+  /// Optional margin around the tile (useful in horizontal lists).
   final EdgeInsetsGeometry? margin;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => context.push('/products/${product.id}'),
+      onTap: () => context.push('/products/${product.id}'), // Product details
       child: Container(
         width: 196,
         margin: margin,
@@ -38,6 +59,7 @@ class HomeProductTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Product image + favourite button overlay
             Center(
               child: Stack(
                 children: [
@@ -45,7 +67,7 @@ class HomeProductTile extends StatelessWidget {
                     height: 131,
                     width: 180,
                     decoration: BoxDecoration(
-                      color: const Color((0xFFF0F0F0)),
+                      color: const Color(0xFFF0F0F0),
                       borderRadius: BorderRadius.circular(16),
                       image: DecorationImage(
                         image: NetworkImage(product.image),
@@ -59,6 +81,8 @@ class HomeProductTile extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Product name + colour swatches
             Padding(
               padding: const EdgeInsets.all(5),
               child: Row(
@@ -78,6 +102,8 @@ class HomeProductTile extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Price + rating
             Padding(
               padding: const EdgeInsets.all(5).copyWith(top: 0),
               child: Column(

@@ -83,6 +83,15 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
 
   final http.Client _client;
 
+  /// Fetches all available product categories.
+  ///
+  /// Sends a `GET` request to `/categories` endpoint and returns a list of
+  /// [ProductCategoryModel] objects representing available categories.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductCategoryModel>> getCategories() async {
     try {
@@ -94,10 +103,11 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
-
       final payload = jsonDecode(response.body);
 
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -125,6 +135,20 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches details of a specific product category by its ID.
+  ///
+  /// Sends a `GET` request to `/categories/{categoryId}` endpoint and returns
+  /// a [ProductCategoryModel] containing details such as the category's name,
+  /// colour, and image.
+  ///
+  /// - [categoryId]: The ID of the category to fetch.
+  ///
+  /// Returns a [ProductCategoryModel] on success.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<ProductCategoryModel> getCategory(String categoryId) async {
     try {
@@ -137,7 +161,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body) as DataMap;
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload);
         debugPrint(response.body);
@@ -147,6 +174,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       return ProductCategoryModel.fromMap(payload);
     } on ServerException {
       rethrow;
@@ -160,6 +188,22 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches a paginated list of newly arrived products.
+  ///
+  /// Sends a `GET` request to `/products` with query parameters:
+  /// - `criteria=newArrivals` (to filter for new arrivals).
+  /// - `category` (optional, if provided filters by category).
+  /// - `page` (for pagination).
+  ///
+  /// - [page]: The page number of results to fetch.
+  /// - [categoryId]: (Optional) The ID of the category to filter new arrivals by.
+  ///
+  /// Returns a list of [ProductModel] representing newly added products.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> getNewArrivals({
     required int page,
@@ -183,7 +227,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -193,6 +240,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -210,6 +258,22 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches a paginated list of popular products.
+  ///
+  /// Sends a `GET` request to `/products` with query parameters:
+  /// - `criteria=popular` (to filter for popular products).
+  /// - `category` (optional, if provided filters by category).
+  /// - `page` (for pagination).
+  ///
+  /// - [page]: The page number of results to fetch.
+  /// - [categoryId]: (Optional) The ID of the category to filter popular products by.
+  ///
+  /// Returns a list of [ProductModel] representing the most popular products.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> getPopular({
     required int page,
@@ -233,7 +297,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -243,6 +310,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -260,6 +328,20 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches detailed information about a specific product.
+  ///
+  /// Sends a `GET` request to `/products/{productId}` endpoint and returns
+  /// the corresponding [ProductModel].
+  ///
+  /// - [productId]: The unique ID of the product to retrieve.
+  ///
+  /// Returns a [ProductModel] containing detailed product data including
+  /// name, description, price, stock, category, and more.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<ProductModel> getProduct(String productId) async {
     try {
@@ -272,7 +354,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body) as DataMap;
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload);
         debugPrint(response.body);
@@ -282,6 +367,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       return ProductModel.fromMap(payload);
     } on ServerException {
       rethrow;
@@ -295,6 +381,21 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches reviews for a specific product.
+  ///
+  /// Sends a `GET` request to `/products/{productId}/reviews` endpoint and
+  /// returns a paginated list of [ReviewModel].
+  ///
+  /// - [productId]: The unique ID of the product whose reviews should be fetched.
+  /// - [page]: The page number for paginated review results.
+  ///
+  /// Returns a list of [ReviewModel] containing user feedback, ratings,
+  /// comments, and review metadata.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ReviewModel>> getProductReviews({
     required String productId,
@@ -315,7 +416,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -325,6 +429,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -342,6 +447,20 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches a paginated list of all products.
+  ///
+  /// Sends a `GET` request to `/products` endpoint and returns a
+  /// list of [ProductModel].
+  ///
+  /// - [page]: The page number for paginated product results.
+  ///
+  /// Returns a list of [ProductModel] containing product details such as
+  /// name, description, price, stock availability, category, and images.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> getProducts(int page) async {
     try {
@@ -357,7 +476,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -367,6 +489,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -384,6 +507,21 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Fetches products filtered by category with pagination support.
+  ///
+  /// Sends a `GET` request to `/products` endpoint with query parameters
+  /// for category and page number, returning a list of [ProductModel].
+  ///
+  /// - [categoryId]: The ID of the category to filter products by.
+  /// - [page]: The page number for paginated product results.
+  ///
+  /// Returns a list of [ProductModel] containing products that belong
+  /// to the specified category.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> getProductsByCategory({
     required String categoryId,
@@ -402,7 +540,10 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -412,6 +553,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -429,6 +571,22 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Submits a review for a specific product.
+  ///
+  /// Sends a `POST` request to `/products/{productId}/reviews` endpoint with
+  /// the review details. The request body contains the user ID, comment, and rating.
+  ///
+  /// - [productId]: The ID of the product being reviewed.
+  /// - [userId]: The ID of the user submitting the review.
+  /// - [comment]: The review text provided by the user.
+  /// - [rating]: The rating score given by the user (e.g., 1.0–5.0).
+  ///
+  /// Does not return any data on success, only ensures the review was submitted.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200` or `201`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> leaveReview({
     required String productId,
@@ -452,7 +610,9 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         }),
       );
 
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -475,6 +635,21 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Searches across all products with a given query.
+  ///
+  /// Sends a `GET` request to `/products/search` endpoint with the provided
+  /// [query] string and pagination [page].
+  ///
+  /// - [query]: The search term entered by the user (e.g., "shoes").
+  /// - [page]: The page number for pagination, starting from 1.
+  ///
+  /// Returns a list of [ProductModel] matching the search term across all
+  /// available categories.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> searchAllProducts({
     required String query,
@@ -492,8 +667,12 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
+
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -503,6 +682,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -520,6 +700,23 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Searches products by category with a given query.
+  ///
+  /// Sends a `GET` request to `/products/search` endpoint with the provided
+  /// [query] string, restricted to the specified [categoryId], and supports
+  /// pagination via [page].
+  ///
+  /// - [query]: The search term entered by the user (e.g., "jacket").
+  /// - [categoryId]: The ID of the category to narrow down the search.
+  /// - [page]: The page number for pagination, starting from 1.
+  ///
+  /// Returns a list of [ProductModel] that match the query within the given
+  /// category.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> searchByCategory({
     required String query,
@@ -538,8 +735,12 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
+
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -549,6 +750,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -566,6 +768,25 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
     }
   }
 
+  /// Searches products by category and gender/age category with a given query.
+  ///
+  /// Sends a `GET` request to `/products/search` endpoint with the provided
+  /// [query], restricted to both [categoryId] and [genderAgeCategory], and
+  /// supports pagination via [page].
+  ///
+  /// - [query]: The search term entered by the user (e.g., "running shoes").
+  /// - [categoryId]: The ID of the category to narrow down the search.
+  /// - [genderAgeCategory]: An additional filter such as "men", "women",
+  ///   "kids", etc., used to refine search results by audience.
+  /// - [page]: The page number for pagination, starting from 1.
+  ///
+  /// Returns a list of [ProductModel] that match the query filtered by the
+  /// given category and gender/age group.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<ProductModel>> searchByCategoryAndGenderAgeCategory({
     required String query,
@@ -582,6 +803,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         'genderAgeCategory': genderAgeCategory,
         'page': '$page',
       };
+
       final uri = NetworkConstants.baseUrl.startsWith('https')
           ? Uri.https(NetworkConstants.authority, endpoint, queryParams)
           : Uri.http(NetworkConstants.authority, endpoint, queryParams);
@@ -590,8 +812,12 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
+
       final payload = jsonDecode(response.body);
+
+      // Refresh token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         final errorResponse = ErrorResponse.fromMap(payload as DataMap);
         debugPrint(response.body);
@@ -601,6 +827,7 @@ class ProductRemoteDataSrcImpl implements ProductRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()

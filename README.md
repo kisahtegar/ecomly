@@ -1,59 +1,65 @@
-# Ecomly App
-
-Ecomly is a ecommerce application built using the **Flutter & ExpressJS** stack. This project combines a robust backend with a responsive and intuitive mobile frontend to deliver a seamless user experience for discovering, ordering, and managing product.
+# 🛍️ Ecomly — E-Commerce Platform
 
 ---
 
-## Project Structure
+## 🚀 Overview
 
-The repository is organized into two main directories:
-
-- [**ecomly_backend**](./ecomly_backend): Contains the backend API built using Node.js, Express, and MongoDB. Provides RESTful services to handle authentication, orders, menus, and more.
-- [**ecomly_frontend**](./ecomly_frontend): The mobile application frontend developed using React Native and Expo. Allows users to browse restaurants, view menus, and place orders.
+**Ecomly** is a full-stack e-commerce application built using the **Flutter & ExpressJS** stack. The platform provides everything needed for an e-commerce experience: product browsing, authentication, cart, checkout, reviews, and admin management.
 
 ---
 
-## Features
+## 🛠️ Tech Stack
 
-### Frontend Highlights
+**Frontend (ecomly\_client):**
 
-- User-friendly interface for food and restaurant browsing.
-- Real-time order tracking and push notifications.
-- Address management and location-based services using Google Places API.
+* Flutter + Riverpod (state management)
+* GoRouter (navigation)
+* Dio / HTTP (API communication)
+* Infinite Scroll Pagination
+* Lottie Animations
 
-### Backend Highlights
+**Backend (ecomly\_server):**
 
-- Secure API endpoints with JWT-based authentication.
-- Scalable database design with MongoDB for efficient data handling.
-- Integration with Firebase Cloud Messaging for notification services.
-
----
-
-## Quick Start
-
-### Prerequisites
-
-Ensure you have the following installed:
-
-- [Node.js](https://nodejs.org/) (v16 or higher)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- MongoDB (local or cloud instance)
-- Expo CLI for frontend development
-- Firebase account for notifications and analytics
-- Google Cloud account for Maps API
-
-### Setting Up
-
-1. **Clone the Repository**:
-
-   ```bash
-   git clone https://github.com/your-repo/ecomly.git
-   cd ecomly
+* Express.js
+* MongoDB + Mongoose
+* JWT Authentication
+* Nodemailer (transactional emails)
+* Stripe (payment ready integration)
 
 ---
 
-## ✨ About Us
+## 📂 Project Structure
+
+```bash
+ECOMLY/
+│── ecomly_client/   # Flutter client (mobile app)
+│── ecomly_server/   # Express.js backend (API + database)
+│── README.md        # This root documentation
+```
+
+---
+
+## 🔗 Documentation
+
+* 📱 [Ecomly Client README](./ecomly_client/README.md)
+* 🗄️ [Ecomly Server README](./ecomly_server/README.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the project.
+2. Create a feature branch: `git checkout -b feature/my-feature`.
+3. Commit your changes: `git commit -m 'Add my feature'`.
+4. Push the branch: `git push origin feature/my-feature`.
+5. Submit a pull request 🚀.
+
+---
+
+## 👨‍💻 About Me
 
 - 💻 All of my projects are available at [github.com/kisahtegar](https://github.com/kisahtegar)
-- 📫 How to reach me **<code.kisahtegar@gmail.com>**
-- 📄 Know about my experiences [kisahcode.web.app](https://kisahcode.web.app)
+- 📫 How to reach me: **[code.kisahtegar@gmail.com](mailto:code.kisahtegar@gmail.com)**
+- 🌐 Portfolio: [kisahcode.web.app](https://kisahcode.web.app)

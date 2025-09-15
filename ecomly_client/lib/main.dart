@@ -8,19 +8,30 @@ import 'package:ecomly_client/core/resources/styles/colours.dart';
 import 'package:ecomly_client/core/services/injection_container.dart';
 import 'package:ecomly_client/core/services/router.dart' show router;
 
+/// The entry point of the Ecomly client app.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables (e.g., API keys, base URLs).
   await dotenv.load(fileName: ".env");
+
+  // Initialize services and dependency injection.
   await init();
+
+  // Restore previously selected theme mode.
   sl<CacheHelper>().getThemeMode();
+
+  // Launch the app with Riverpod provider scope.
   runApp(const ProviderScope(child: MainApp()));
 }
 
+/// The root widget of the application.
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    /// Base light theme configuration.
     final theme = ThemeData(
       colorScheme: ColorScheme.fromSeed(
         seedColor: Colours.lightThemePrimaryColour,
@@ -36,6 +47,8 @@ class MainApp extends StatelessWidget {
       ),
       useMaterial3: true,
     );
+
+    // Reactively rebuilds the app when the theme mode changes.
     return ValueListenableBuilder(
       valueListenable: Cache.instance.themeModeNotifier,
       builder: (_, themeMode, __) {
@@ -44,6 +57,9 @@ class MainApp extends StatelessWidget {
           routerConfig: router,
           themeMode: themeMode,
           theme: theme,
+          debugShowCheckedModeBanner: false,
+
+          /// Dark theme customization with Ecomly colors.
           darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
             scaffoldBackgroundColor: Colours.darkThemeBGDark,
             appBarTheme: const AppBarTheme(

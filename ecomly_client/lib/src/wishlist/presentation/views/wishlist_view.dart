@@ -14,9 +14,17 @@ import 'package:ecomly_client/core/utils/core_utils.dart';
 import 'package:ecomly_client/src/wishlist/presentation/app/adapter/wishlist_provider.dart';
 import 'package:ecomly_client/src/wishlist/presentation/widgets/wishlist_product_tile.dart';
 
+/// The main view for displaying the user's wishlist (saved items).
+///
+/// Features:
+/// - Fetches and displays all wishlist products for the logged-in user.
+/// - Supports pull-to-refresh using [RefreshIndicator].
+/// - Shows empty state, loading state, or error animations where appropriate.
+/// - Allows navigation to product detail or cart operations via [WishlistProductTile].
 class WishlistView extends ConsumerStatefulWidget {
   const WishlistView({super.key});
 
+  /// Route path for this view.
   static const path = '/wishlist';
 
   @override
@@ -24,18 +32,16 @@ class WishlistView extends ConsumerStatefulWidget {
 }
 
 class _WishlistViewState extends ConsumerState<WishlistView> {
+  /// Family key to scope this provider instance to the current widget.
   final wishlistAdapterFamilyKey = GlobalKey();
-
-  Future<void> getUserWishlist() async {
-    return ref
-        .read(userWishlistProvider(wishlistAdapterFamilyKey).notifier)
-        .getWishlist(Cache.instance.userId!);
-  }
 
   @override
   void initState() {
     super.initState();
+    // Trigger initial fetch after first frame
     CoreUtils.postFrameCall(getUserWishlist);
+
+    // Listen for wishlist errors and display SnackBar messages
     ref.listenManual(userWishlistProvider(wishlistAdapterFamilyKey), (
       previous,
       next,
@@ -44,6 +50,16 @@ class _WishlistViewState extends ConsumerState<WishlistView> {
         CoreUtils.showSnackBar(context, message: '$message\nPULL TO REFRESH');
       }
     });
+  }
+
+  /// Fetches the wishlist for the currently logged-in user.
+  ///
+  /// Calls the [UserWishlist] provider’s `getWishlist`. Uses the [Cache]
+  /// singleton to read the current `userId`.
+  Future<void> getUserWishlist() async {
+    return ref
+        .read(userWishlistProvider(wishlistAdapterFamilyKey).notifier)
+        .getWishlist(Cache.instance.userId!);
   }
 
   @override
@@ -64,13 +80,16 @@ class _WishlistViewState extends ConsumerState<WishlistView> {
         body: SafeArea(
           child: Builder(
             builder: (context) {
+              /// Loading state
               if (wishlistState is GettingUserWishlist) {
                 return const Center(
                   child: CircularProgressIndicator.adaptive(
                     backgroundColor: Colours.lightThemePrimaryColour,
                   ),
                 );
-              } else if (wishlistState is FetchedUserWishlist) {
+              }
+              /// Successfully fetched wishlist
+              else if (wishlistState is FetchedUserWishlist) {
                 if (wishlistState.wishlist.isEmpty) {
                   return const EmptyData('No Saved Products');
                 }
@@ -86,9 +105,13 @@ class _WishlistViewState extends ConsumerState<WishlistView> {
                   separatorBuilder: (_, __) => const Gap(20),
                   itemCount: wishlistState.wishlist.length,
                 );
-              } else if (wishlistState is WishlistError) {
+              }
+              /// Error state (fallback animation)
+              else if (wishlistState is WishlistError) {
                 return Center(child: Lottie.asset(Media.error));
               }
+
+              /// Default: return nothing
               return const SizedBox.shrink();
             },
           ),

@@ -23,6 +23,22 @@ import 'package:ecomly_client/src/user/presentation/views/payment_profile_view.d
 import 'package:ecomly_client/src/user/presentation/views/profile_view.dart';
 import 'package:ecomly_client/src/wishlist/presentation/views/wishlist_view.dart';
 
+/// A side navigation drawer for the dashboard.
+///
+/// Displays the current user’s profile, navigation shortcuts,
+/// theme toggle, and a sign-out button.
+///
+/// Integrates with [authUserProvider] to fetch additional user data
+/// (e.g., payment profile) and handles navigation actions.
+///
+/// ### Example:
+/// ```dart
+/// Scaffold(
+///   key: DashboardUtils.scaffoldKey,
+///   drawer: const DashboardDrawer(),
+///   body: ...
+/// )
+/// ```
 class DashboardDrawer extends ConsumerStatefulWidget {
   const DashboardDrawer({super.key});
 
@@ -31,24 +47,12 @@ class DashboardDrawer extends ConsumerStatefulWidget {
 }
 
 class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
-  final signingOutNotifier = ValueNotifier(false);
+  /// Used to scope the [authUserProvider] when fetching user-specific data
+  /// such as payment profile.
   final authUserFamilyKey = GlobalKey();
 
-  @override
-  void initState() {
-    super.initState();
-    ref.listenManual(authUserProvider(authUserFamilyKey), (previous, next) {
-      if (next is AuthUserError) {
-        final AuthUserError(:message) = next;
-        Scaffold.of(context).closeDrawer();
-        CoreUtils.showSnackBar(context, message: message);
-      } else if (next case FetchedUserPaymentProfile(
-        :final paymentProfileUrl,
-      )) {
-        context.push(PaymentProfileView.path, extra: paymentProfileUrl);
-      }
-    });
-  }
+  /// Tracks the loading state of the sign-out process.
+  final signingOutNotifier = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -57,9 +61,28 @@ class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    // Listen to authentication-related state changes.
+    ref.listenManual(authUserProvider(authUserFamilyKey), (previous, next) {
+      if (next is AuthUserError) {
+        // Close drawer and show error if fetching user data fails.
+        final AuthUserError(:message) = next;
+        Scaffold.of(context).closeDrawer();
+        CoreUtils.showSnackBar(context, message: message);
+      } else if (next case FetchedUserPaymentProfile(
+        :final paymentProfileUrl,
+      )) {
+        // Navigate to Payment Profile when fetched.
+        context.push(PaymentProfileView.path, extra: paymentProfileUrl);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider);
-
     final authUserAdapter = ref.watch(authUserProvider(authUserFamilyKey));
 
     return Drawer(
@@ -70,6 +93,7 @@ class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
       ),
       child: Column(
         children: [
+          /// User profile header (avatar + name).
           Expanded(
             child: Center(
               child: Column(
@@ -95,6 +119,8 @@ class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
               ),
             ),
           ),
+
+          /// Drawer menu items (Profile, Payment Profile, Wishlist, etc.)
           Expanded(
             flex: 2,
             child: ListView.separated(
@@ -126,23 +152,25 @@ class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
                   onTap: () {
                     if (index != 1) Scaffold.of(context).closeDrawer();
                     switch (index) {
-                      case 0:
+                      case 0: // Profile
                         context.push(ProfileView.path);
-                      case 1:
+                      case 1: // Payment Profile
                         ref
                             .read(authUserProvider(authUserFamilyKey).notifier)
                             .getUserPaymentProfile(Cache.instance.userId!);
-                      case 2:
+                      case 2: // Wishlist
                         DashboardState.instance.changeIndex(3);
                         context.go(WishlistView.path);
                       case 3:
-                      // TODO(Nav): Go to OrdersPage
+                      // TODO(Nav): Implement OrdersPage navigation
                     }
                   },
                 );
               },
             ),
           ),
+
+          /// Theme toggle + Sign-out button.
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
@@ -152,6 +180,8 @@ class _DashboardDrawerState extends ConsumerState<DashboardDrawer> {
               children: [
                 const ThemeToggle(),
                 const Gap(10),
+
+                /// Sign out action with confirmation dialog.
                 ValueListenableBuilder(
                   valueListenable: signingOutNotifier,
                   builder: (_, value, __) {

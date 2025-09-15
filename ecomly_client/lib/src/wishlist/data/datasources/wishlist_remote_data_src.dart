@@ -31,6 +31,17 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
 
   final http.Client _client;
 
+  /// Fetches the wishlist contents for a specific user.
+  ///
+  /// Sends a `GET` request to `/users/{userId}/wishlist` endpoint and returns a
+  /// list of [WishlistProductModel].
+  ///
+  /// - [userId]: The ID of the user whose wishlist should be fetched.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<List<WishlistProductModel>> getWishlist(String userId) async {
     try {
@@ -44,7 +55,10 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
       final payload = jsonDecode(response.body);
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200) {
         payload as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -55,6 +69,7 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
           statusCode: response.statusCode,
         );
       }
+
       payload as List<dynamic>;
       return payload
           .cast<DataMap>()
@@ -74,6 +89,18 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
     }
   }
 
+  /// Adds a product to the user's wishlist.
+  ///
+  /// Sends a `POST` request to `/users/{userId}/wishlist` endpoint with the
+  /// provided [productId] in the request body.
+  ///
+  /// - [userId]: The ID of the user whose wishlist should be updated.
+  /// - [productId]: The ID of the product to be added to the wishlist.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200` or `201`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> addToWishlist({
     required String userId,
@@ -90,7 +117,10 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
         headers: Cache.instance.sessionToken!.toAuthHeaders,
         body: jsonEncode({'productId': productId}),
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -113,6 +143,18 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
     }
   }
 
+  /// Removes a product from the user's wishlist.
+  ///
+  /// Sends a `DELETE` request to `/users/{userId}/wishlist/{productId}` endpoint
+  /// to remove the specified product from the user's wishlist.
+  ///
+  /// - [userId]: The ID of the user whose wishlist should be updated.
+  /// - [productId]: The ID of the product to be removed from the wishlist.
+  ///
+  /// Throws a [ServerException] if:
+  /// - The API response status code is not `200` or `204`.
+  /// - The response body contains an error message.
+  /// - Any unexpected error occurs (rethrows as `ServerException`).
   @override
   Future<void> removeFromWishlist({
     required String userId,
@@ -128,7 +170,10 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
         uri,
         headers: Cache.instance.sessionToken!.toAuthHeaders,
       );
+
+      // Refreshes token if expired
       await NetworkUtils.renewToken(response);
+
       if (response.statusCode != 200 && response.statusCode != 204) {
         final payload = jsonDecode(response.body) as DataMap;
         final errorResponse = ErrorResponse.fromMap(payload);
@@ -151,6 +196,7 @@ class WishlistRemoteDataSrcImpl implements WishlistRemoteDataSrc {
     }
   }
 
+  /// Builds the wishlist API endpoint for a specific user.
   String _userWishlistEndpoint(String userId) {
     return '/users/$userId/wishlist';
   }

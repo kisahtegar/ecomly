@@ -102,7 +102,7 @@ exports.getPaymentProfile = async (req, res) => {
     }
     const session = await stripe.billingPortal.sessions.create({
       customer: user.paymentCustomerId,
-      return_url: "https://dbestech.biz/ecomly",
+      return_url: "https://kisahcode.com/ecomly",
     });
 
     return res.json({ url: session.url });

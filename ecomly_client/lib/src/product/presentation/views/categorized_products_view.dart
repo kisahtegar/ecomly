@@ -7,9 +7,24 @@ import 'package:ecomly_client/src/product/domain/entities/category.dart';
 import 'package:ecomly_client/src/product/presentation/app/adapter/product_adapter.dart';
 import 'package:ecomly_client/src/product/presentation/widgets/paginated_product_grid_view.dart';
 
+/// View displaying **products filtered by a specific [ProductCategory]**.
+///
+/// This screen is used when a user taps a category and expects to see only
+/// products belonging to that category.
+///
+/// Example usage:
+/// ```dart
+/// Navigator.push(
+///   context,
+///   MaterialPageRoute(
+///     builder: (_) => CategorizedProductsView(category),
+///   ),
+/// );
+/// ```
 class CategorizedProductsView extends ConsumerStatefulWidget {
   const CategorizedProductsView(this.category, {super.key});
 
+  /// The category whose products should be displayed.
   final ProductCategory category;
 
   @override
@@ -18,8 +33,13 @@ class CategorizedProductsView extends ConsumerStatefulWidget {
 
 class _CategorizedProductsViewState
     extends ConsumerState<CategorizedProductsView> {
+  /// Key for isolating the state of this product adapter instance.
   final familyKey = GlobalKey();
 
+  /// Fetches products for the selected [ProductCategory].
+  ///
+  /// Called by the [PaginatedProductGridView] when scrolling. Uses
+  /// [ProductAdapter.getProductsByCategory].
   Future<void> getProducts(int page) async {
     return ref
         .read(productAdapterProvider(familyKey).notifier)
@@ -38,6 +58,8 @@ class _CategorizedProductsViewState
         child: PaginatedProductGridView(
           productAdapterFamilyKey: familyKey,
           fetchRequest: getProducts,
+
+          /// Disable category filter UI since this view is already scoped
           categorized: false,
         ),
       ),

@@ -15,14 +15,19 @@ import 'package:ecomly_client/src/home/presentation/views/home_view.dart';
 import 'package:ecomly_client/src/user/presentation/views/profile_view.dart';
 import 'package:ecomly_client/src/wishlist/presentation/views/wishlist_view.dart';
 
+/// The main screen of the application, containing:
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({required this.state, required this.child, super.key});
 
+  /// Current navigation state provided by [GoRouter].
   final GoRouterState state;
+
+  /// The active child view rendered in the body of the screen.
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
+    // Determines which tab should appear active based on the route.
     final activeIndex = DashboardUtils.activeIndex(state);
 
     return Scaffold(
