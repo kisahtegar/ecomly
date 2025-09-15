@@ -1,0 +1,32 @@
+import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:ecomly_client/core/common/app/cache_helper.dart';
+import 'package:ecomly_client/core/common/singletons/cache.dart';
+import 'package:ecomly_client/core/services/injection_container.dart';
+import 'package:ecomly_client/src/auth/presentation/views/forgot_password_screen.dart';
+import 'package:ecomly_client/src/auth/presentation/views/login_screen.dart';
+import 'package:ecomly_client/src/auth/presentation/views/registration_screen.dart';
+import 'package:ecomly_client/src/auth/presentation/views/reset_password_screen.dart';
+import 'package:ecomly_client/src/auth/presentation/views/splash_screen.dart';
+import 'package:ecomly_client/src/auth/presentation/views/verify_otp_screen.dart';
+import 'package:ecomly_client/src/cart/presentation/views/cart_view.dart';
+import 'package:ecomly_client/src/cart/presentation/views/checkout_successful_view.dart';
+import 'package:ecomly_client/src/cart/presentation/views/checkout_view.dart';
+import 'package:ecomly_client/src/dashboard/presentation/views/dashboard_screen.dart';
+import 'package:ecomly_client/src/explore/presentation/views/explore_view.dart';
+import 'package:ecomly_client/src/home/presentation/views/home_view.dart';
+import 'package:ecomly_client/src/on_boarding/presentation/views/on_boarding_screen.dart';
+import 'package:ecomly_client/src/product/domain/entities/category.dart';
+import 'package:ecomly_client/src/product/domain/entities/product.dart';
+import 'package:ecomly_client/src/product/features/review/presentation/views/product_reviews.dart';
+import 'package:ecomly_client/src/product/presentation/views/all_new_arrivals_view.dart';
+import 'package:ecomly_client/src/product/presentation/views/all_popular_products_view.dart';
+import 'package:ecomly_client/src/product/presentation/views/categorized_products_view.dart';
+import 'package:ecomly_client/src/product/presentation/views/product_details_view.dart';
+import 'package:ecomly_client/src/product/presentation/views/search_view.dart';
+import 'package:ecomly_client/src/user/presentation/views/payment_profile_view.dart';
+import 'package:ecomly_client/src/user/presentation/views/profile_view.dart';
+import 'package:ecomly_client/src/wishlist/presentation/views/wishlist_view.dart';
+
+part 'router.main.dart';

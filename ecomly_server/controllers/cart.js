@@ -301,7 +301,7 @@ exports.modifyProductQuantity = async function (req, res) {
  *
  * Removes a product from a user's cart, restoring stock if applicable, with transactional consistency.
  *
- * @param {Object} req - Express request object, expects user `id` and `cartProductId` in params.
+ * @param {Object} req - Express request object, expects user `userId` and `cartProductId` in params.
  * @param {Object} res - Express response object, returns no content on success.
  *
  * @returns {JSON} Various status codes (204 on success, 400 if product not in cart, 404 if user/cart item not found, 500 on error)
@@ -310,7 +310,7 @@ exports.removeFromCart = async function (req, res) {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.userId);
     if (!user) {
       await session.abortTransaction();
       return res.status(404).json({ message: "User not found" });

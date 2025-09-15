@@ -333,8 +333,8 @@ exports.checkout = async function (req, res) {
     phone_number_collection: { enabled: true },
     customer: customerId,
     mode: "payment",
-    success_url: "https://dbestech.biz/payment-success",
-    cancel_url: "https://dbestech.biz/cart",
+    success_url: "https://kisahcode.com/payment-success",
+    cancel_url: "https://kisahcode.com/cart",
   });
 
   res.status(201).json({ url: session.url });

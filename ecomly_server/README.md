@@ -1,3 +1,5 @@
+# 🗄️ Ecomly Server
+
 <p align="center">
    <a href="https://expressjs.com/" target="_blank">
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/64/Expressjs.png" alt="Express.js Logo" width="400">
@@ -35,6 +37,26 @@
 
 ---
 
+## 📂 Project Structure
+
+```bash
+ecomly_server/
+├── controllers/      # Request handlers (auth, products, cart, orders, etc.)
+├── helpers/          # Utility functions (crypto, mailer, etc.)
+├── middlewares/      # Authentication, validation, error handling
+├── models/           # Mongoose models & schemas
+├── postman/          # Postman collection for API testing
+├── public/           # Static files (if needed)
+├── routes/           # Express routes mapping to controllers
+├── .env.example      # Example environment variables
+├── .gitignore        # Git ignored files
+├── app.js            # Main Express app entry point
+├── package.json      # Dependencies and scripts
+└── README.md         # Documentation
+```
+
+---
+
 ## ✨ Features
 
 - **User Authentication**
@@ -58,7 +80,7 @@
 
 ---
 
-## ⚡ Installation
+## ⚙️ Installation
 
 ### Prerequisites
 
@@ -165,15 +187,15 @@ This makes it easier for contributors and users to understand and test the API f
 Contributions are welcome! Please follow these steps:
 
 1. Fork the project.
-2. Create a new branch (`git checkout -b feature/my-feature`).
-3. Commit your changes (`git commit -m 'Add feature'`).
-4. Push the branch (`git push origin feature/my-feature`).
-5. Submit a pull request.
+2. Create a feature branch: `git checkout -b feature/my-feature`.
+3. Commit your changes: `git commit -m 'Add my feature'`.
+4. Push the branch: `git push origin feature/my-feature`.
+5. Submit a pull request 🚀.
 
 ---
 
-## ✨ About Us
+## 👨‍💻 About Me
 
 - 💻 All of my projects are available at [github.com/kisahtegar](https://github.com/kisahtegar)
-- 📫 How to reach me **<code.kisahtegar@gmail.com>**
-- 📄 Know about my experiences [kisahcode.web.app](https://kisahcode.web.app)
+- 📫 How to reach me: **[code.kisahtegar@gmail.com](mailto:code.kisahtegar@gmail.com)**
+- 🌐 Portfolio: [kisahcode.web.app](https://kisahcode.web.app)

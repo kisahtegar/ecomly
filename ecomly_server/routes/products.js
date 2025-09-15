@@ -5,8 +5,8 @@ const reviewsController = require('../controllers/reviews');
 
 router.get('/', productsController.getProducts);
 router.get('/search', productsController.searchProducts);
-
 router.get('/:id', productsController.getProductById);
+
 router.post('/:id/reviews', reviewsController.leaveReview);
 router.get('/:id/reviews', reviewsController.getProductReviews);
 
